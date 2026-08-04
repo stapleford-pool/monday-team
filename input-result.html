@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Input Result - Stapleford Cue Club Pool Team</title>
+<style>
+  :root{
+    --felt: #0f4d3a;
+    --felt-dark: #0a3a2b;
+    --rail: #4a2c1d;
+    --rail-dark: #331f14;
+    --ivory: #f3ede0;
+    --gold: #c9a227;
+    --line: rgba(243,237,224,0.16);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 20% 10%, rgba(255,255,255,0.04), transparent 40%),
+      var(--felt);
+    background-image:
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 3px),
+      var(--felt);
+    font-family: 'Segoe UI', -apple-system, system-ui, sans-serif;
+    color: var(--ivory);
+    padding-bottom: 60px;
+  }
+  .rail{
+    background: linear-gradient(180deg, var(--rail) 0%, var(--rail-dark) 100%);
+    border-bottom: 4.5px solid var(--gold);
+    padding: 24px 15px 20px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+  }
+  .rail-inner{ max-width: 620px; margin: 0 auto; }
+  .back-link{
+    color: var(--gold);
+    font-size: 12px;
+    text-decoration: none;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+  h1{
+    font-family: 'Oswald', 'Arial Narrow', sans-serif;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-size: clamp(19px, 4vw, 30px);
+    margin: 4px 0 0;
+    color: var(--ivory);
+    text-shadow: 0 2px 0 rgba(0,0,0,0.3);
+  }
+
+  main{
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 28px 20px 0;
+  }
+
+  .card{
+    background: rgba(0,0,0,0.18);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 22px;
+  }
+
+  .field{ margin-bottom: 16px; }
+  .field label{
+    display:block;
+    color: var(--gold);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  .field select, .field input{
+    width: 100%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--line);
+    color: var(--ivory);
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+  }
+  .field select:focus, .field input:focus{ outline:none; border-color: var(--gold); }
+  #dateInput, .venue-select, .player-select{
+    background: var(--ivory);
+    color: #1c1b19;
+  }
+  .venue-select option, .player-select option{
+    color: #1c1b19;
+    background: var(--ivory);
+  }
+
+  .row-2{ display: flex; gap: 12px; }
+  .row-2 .field{ flex: 1; margin-bottom: 0; }
+
+  .manage-link{
+    background: none;
+    border: none;
+    color: var(--gold);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 8px 0 0;
+  }
+  .manage-panel{
+    margin-top: 10px;
+    background: rgba(0,0,0,0.15);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 12px;
+  }
+  .manage-add-row{ display: flex; gap: 8px; margin-bottom: 10px; }
+  .manage-add-row input{
+    flex: 1;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--line);
+    color: var(--ivory);
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+  }
+  .manage-add-row input:focus{ outline:none; border-color: var(--gold); }
+  .manage-add-row button{
+    background: var(--gold);
+    color: var(--rail-dark);
+    border: none;
+    padding: 0 16px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .manage-team-row{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 13px;
+  }
+  .manage-team-row:last-child{ border-bottom: none; }
+  .manage-team-row input[type="checkbox"]{ width: 16px; height: 16px; accent-color: #d9534f; cursor: pointer; }
+  .manage-empty{ font-size: 12px; color: rgba(243,237,224,0.5); padding: 6px 0; }
+  .manage-delete-row{ display: flex; justify-content: flex-end; margin-top: 8px; }
+  .manage-delete-row button{
+    background: #d9534f;
+    color: var(--ivory);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .manage-delete-row button:hover:not(:disabled){ filter: brightness(1.1); }
+  .manage-delete-row button:disabled{ opacity: 0.4; cursor: not-allowed; }
+
+  .legs-sections{
+    margin-top: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .leg-section{
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: rgba(0,0,0,0.15);
+    padding: 14px 16px;
+  }
+  .leg-section-title{
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--gold);
+    margin-bottom: 10px;
+  }
+  .leg-section-field{ margin-bottom: 10px; }
+  .leg-section-field:last-child{ margin-bottom: 0; }
+  .leg-section-field label{
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: rgba(243,237,224,0.5);
+    margin-bottom: 5px;
+  }
+  .checkbox-row{
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    flex-wrap: wrap;
+  }
+  .checkbox-item{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .checkbox-item label{
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--ivory);
+    text-transform: none;
+    letter-spacing: normal;
+    margin-bottom: 0;
+    cursor: pointer;
+  }
+  .player-select{
+    width: 100%;
+    padding: 9px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    font-size: 13px;
+    font-family: inherit;
+  }
+  .player-select:focus{ outline:none; border-color: var(--gold); }
+  .leg-result-toggle{ display: flex; gap: 6px; }
+  .leg-won-checkbox, .first-visit-checkbox{
+    width: 20px;
+    height: 20px;
+    accent-color: var(--gold);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .leg-result-btn{
+    flex: 1;
+    padding: 9px 0;
+    border-radius: 6px;
+    border: 1.5px solid var(--line);
+    background: transparent;
+    color: rgba(243,237,224,0.55);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    min-width: 44px;
+  }
+  .leg-result-btn.selected{
+    border-color: var(--gold);
+    background: var(--gold);
+    color: var(--rail-dark);
+  }
+  .leg-result-btn.selected.lose{
+    border-color: #d9534f;
+    background: #d9534f;
+    color: var(--ivory);
+  }
+  .leg-result-btn.selected.win{
+    border-color: #4caf6b;
+    background: #4caf6b;
+    color: var(--ivory);
+  }
+
+  .submit-btn{
+    width: 100%;
+    background: var(--gold);
+    color: var(--rail-dark);
+    border: none;
+    padding: 13px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-top: 18px;
+  }
+  .submit-btn:hover{ filter: brightness(1.08); }
+
+  .form-msg{ font-size: 12px; margin-top: 10px; min-height: 16px; text-align: center; }
+
+  .not-admin{ text-align: center; padding: 50px 24px; color: rgba(243,237,224,0.6); }
+  .not-admin h2{
+    font-family: 'Oswald', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--ivory);
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+
+  .result-row{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 13px;
+  }
+  .result-row:last-child{ border-bottom: none; }
+  .result-row .rr-name{ font-weight: 600; color: var(--ivory); }
+  .result-row .rr-meta{ color: rgba(243,237,224,0.55); font-size: 12px; }
+  .result-row .rr-badge{
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+  .rr-badge.win{ background: rgba(143,209,158,0.18); color: #8fd19e; }
+  .rr-badge.lose{ background: rgba(217,83,79,0.18); color: #ff8a80; }
+  .rr-check{ width: 17px; height: 17px; flex-shrink: 0; accent-color: #d9534f; cursor: pointer; }
+  .results-delete-bar{ display:flex; justify-content: flex-end; margin-top: 12px; }
+  .results-delete-bar button{
+    background: #d9534f;
+    color: var(--ivory);
+    border: none;
+    padding: 9px 20px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.4px;
+    cursor: pointer;
+  }
+  .results-delete-bar button:hover:not(:disabled){ filter: brightness(1.1); }
+  .results-delete-bar button:disabled{ opacity: 0.4; cursor: not-allowed; }
+
+  .hidden{ display:none !important; }
+
+  .overlay{
+    position: fixed; inset:0;
+    background: rgba(0,0,0,0.55);
+    display:none;
+    align-items:center; justify-content:center;
+    padding: 20px;
+    z-index: 50;
+  }
+  .overlay.show{ display:flex; }
+  .modal{
+    background: var(--rail);
+    border: 1px solid var(--gold);
+    border-radius: 10px;
+    padding: 26px;
+    max-width: 320px;
+    width: 100%;
+    text-align:center;
+  }
+  .modal h2{
+    margin: 0 0 6px;
+    font-family: 'Oswald', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 18px;
+    color: var(--ivory);
+  }
+  .modal p{ font-size: 13px; color: rgba(243,237,224,0.7); margin: 0 0 14px; }
+  .modal-actions{ display:flex; gap: 10px; margin-top: 6px; }
+  .modal-actions button{
+    flex:1; padding: 10px; border-radius: 6px; border: none;
+    font-weight: 700; cursor: pointer; font-size: 13px;
+  }
+  .modal-actions .confirm{ background: var(--gold); color: var(--rail-dark); }
+  .modal-actions .cancel{ background: transparent; color: var(--ivory); border: 1px solid var(--line); }
+</style>
+</head>
+<body>
+
+<div class="rail">
+  <div class="rail-inner">
+    <a class="back-link" href="index.html">&larr; Home</a>
+    <h1>Input Result</h1>
+  </div>
+</div>
+
+<main>
+
+  <div class="not-admin hidden" id="notAdminView">
+    <h2>Admins Only</h2>
+    <p>You need to be signed in as admin to input match results.</p>
+    <p><a class="back-link" href="index.html">&larr; Back to Home</a></p>
+  </div>
+
+  <div class="card hidden" id="formView">
+    <div class="field">
+      <label for="dateInput">Date</label>
+      <input type="text" id="dateInput" placeholder="dd/mm/yyyy" maxlength="10">
+    </div>
+
+    <div class="field">
+      <label for="seasonSelect">Season</label>
+      <select class="venue-select" id="seasonSelect">
+        <option value="">Loading seasons…</option>
+      </select>
+    </div>
+    <button type="button" id="manageSeasonsToggle" class="manage-link">Manage Seasons</button>
+    <div class="manage-panel hidden" id="manageSeasonsPanel">
+      <div class="manage-add-row">
+        <input type="text" id="newSeasonName" placeholder="e.g. 2026 or 2026/2027" maxlength="20">
+        <button type="button" id="addSeasonBtn">Add</button>
+      </div>
+      <div id="manageSeasonsList"></div>
+      <div class="manage-delete-row">
+        <button type="button" id="deleteSeasonsBtn" disabled>Delete Selected</button>
+      </div>
+      <div class="form-msg" id="manageSeasonsMsg"></div>
+    </div>
+
+    <div class="row-2" style="margin-top:16px;">
+      <div class="field">
+        <label for="homeTeamSelect">Home team</label>
+        <select class="venue-select" id="homeTeamSelect">
+          <option value="">Loading venues…</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="awayTeamSelect">Away team</label>
+        <select class="venue-select" id="awayTeamSelect">
+          <option value="">Loading venues…</option>
+        </select>
+      </div>
+    </div>
+    <button type="button" id="manageVenuesToggle" class="manage-link">Manage Venues</button>
+    <div class="manage-panel hidden" id="manageVenuesPanel">
+      <div class="manage-add-row">
+        <input type="text" id="newVenueName" placeholder="New venue name" maxlength="60">
+        <button type="button" id="addVenueBtn">Add</button>
+      </div>
+      <div id="manageVenuesList"></div>
+      <div class="manage-delete-row">
+        <button type="button" id="deleteVenuesBtn" disabled>Delete Selected</button>
+      </div>
+      <div class="form-msg" id="manageVenuesMsg"></div>
+    </div>
+
+    <div class="legs-sections" id="legRows"></div>
+
+    <button type="button" class="submit-btn" id="submitBtn">Save Results</button>
+    <div class="form-msg" id="formMsg"></div>
+  </div>
+
+  <div class="card hidden" id="resultsCard" style="margin-top:18px;">
+    <div style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--gold); margin-bottom:12px;">
+      Results for <span id="resultsDateLabel"></span>
+    </div>
+    <div id="resultsList"></div>
+    <div id="resultsEmpty" style="text-align:center; font-size:13px; color:rgba(243,237,224,0.5); padding:10px 0;">No results entered for this date yet.</div>
+    <div class="results-delete-bar hidden" id="resultsDeleteBar">
+      <button type="button" id="deleteResultsBtn" disabled>Delete</button>
+    </div>
+  </div>
+
+</main>
+
+<div class="overlay" id="confirmOverlay">
+  <div class="modal">
+    <h2>Are You Sure?</h2>
+    <p id="confirmSummary"></p>
+    <div class="modal-actions">
+      <button type="button" class="cancel" id="confirmNo">No</button>
+      <button type="button" class="confirm" id="confirmYes">Yes</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="deleteConfirmOverlay">
+  <div class="modal">
+    <h2>Remove Results?</h2>
+    <p id="deleteConfirmMessage"></p>
+    <div class="modal-actions">
+      <button type="button" class="cancel" id="deleteConfirmNo">No</button>
+      <button type="button" class="confirm" id="deleteConfirmYes" style="background:#d9534f; color:var(--ivory);">Yes, Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="venueDeleteConfirmOverlay">
+  <div class="modal">
+    <h2>Remove Venues?</h2>
+    <p id="venueDeleteConfirmMessage"></p>
+    <div class="modal-actions">
+      <button type="button" class="cancel" id="venueDeleteConfirmNo">No</button>
+      <button type="button" class="confirm" id="venueDeleteConfirmYes" style="background:#d9534f; color:var(--ivory);">Yes, Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="seasonDeleteConfirmOverlay">
+  <div class="modal">
+    <h2>Remove Seasons?</h2>
+    <p id="seasonDeleteConfirmMessage"></p>
+    <div class="modal-actions">
+      <button type="button" class="cancel" id="seasonDeleteConfirmNo">No</button>
+      <button type="button" class="confirm" id="seasonDeleteConfirmYes" style="background:#d9534f; color:var(--ivory);">Yes, Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyA3FwQmu2qxx5XL83WrrRyRZRSrfV1jy_Q",
+    authDomain: "stapleford-pool-monday-team.firebaseapp.com",
+    projectId: "stapleford-pool-monday-team",
+    storageBucket: "stapleford-pool-monday-team.firebasestorage.app",
+    messagingSenderId: "594187227905",
+    appId: "1:594187227905:web:621fa9f607c17a6b7f8100"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  const notAdminView = document.getElementById('notAdminView');
+  const formView = document.getElementById('formView');
+  const dateInput = document.getElementById('dateInput');
+  const seasonSelect = document.getElementById('seasonSelect');
+  const manageSeasonsToggle = document.getElementById('manageSeasonsToggle');
+  const manageSeasonsPanel = document.getElementById('manageSeasonsPanel');
+  const newSeasonName = document.getElementById('newSeasonName');
+  const addSeasonBtn = document.getElementById('addSeasonBtn');
+  const manageSeasonsList = document.getElementById('manageSeasonsList');
+  const deleteSeasonsBtn = document.getElementById('deleteSeasonsBtn');
+  const manageSeasonsMsg = document.getElementById('manageSeasonsMsg');
+  const seasonDeleteConfirmOverlay = document.getElementById('seasonDeleteConfirmOverlay');
+  const seasonDeleteConfirmMessage = document.getElementById('seasonDeleteConfirmMessage');
+  const seasonDeleteConfirmYes = document.getElementById('seasonDeleteConfirmYes');
+  const seasonDeleteConfirmNo = document.getElementById('seasonDeleteConfirmNo');
+
+  const homeTeamSelect = document.getElementById('homeTeamSelect');
+  const awayTeamSelect = document.getElementById('awayTeamSelect');
+  const manageVenuesToggle = document.getElementById('manageVenuesToggle');
+  const manageVenuesPanel = document.getElementById('manageVenuesPanel');
+  const newVenueName = document.getElementById('newVenueName');
+  const addVenueBtn = document.getElementById('addVenueBtn');
+  const manageVenuesList = document.getElementById('manageVenuesList');
+  const deleteVenuesBtn = document.getElementById('deleteVenuesBtn');
+  const manageVenuesMsg = document.getElementById('manageVenuesMsg');
+  const venueDeleteConfirmOverlay = document.getElementById('venueDeleteConfirmOverlay');
+  const venueDeleteConfirmMessage = document.getElementById('venueDeleteConfirmMessage');
+  const venueDeleteConfirmYes = document.getElementById('venueDeleteConfirmYes');
+  const venueDeleteConfirmNo = document.getElementById('venueDeleteConfirmNo');
+
+  const legRows = document.getElementById('legRows');
+  const submitBtn = document.getElementById('submitBtn');
+  const formMsg = document.getElementById('formMsg');
+  const confirmOverlay = document.getElementById('confirmOverlay');
+  const confirmSummary = document.getElementById('confirmSummary');
+  const confirmYes = document.getElementById('confirmYes');
+  const confirmNo = document.getElementById('confirmNo');
+  const resultsCard = document.getElementById('resultsCard');
+  const resultsDateLabel = document.getElementById('resultsDateLabel');
+  const resultsList = document.getElementById('resultsList');
+  const resultsEmpty = document.getElementById('resultsEmpty');
+  const resultsDeleteBar = document.getElementById('resultsDeleteBar');
+  const deleteResultsBtn = document.getElementById('deleteResultsBtn');
+  const deleteConfirmOverlay = document.getElementById('deleteConfirmOverlay');
+  const deleteConfirmMessage = document.getElementById('deleteConfirmMessage');
+  const deleteConfirmYes = document.getElementById('deleteConfirmYes');
+  const deleteConfirmNo = document.getElementById('deleteConfirmNo');
+
+  let playersLoaded = false;
+  let venuesLoaded = false;
+  let allVenues = [];
+  let selectedVenueIds = new Set();
+  let seasonsLoaded = false;
+  let allSeasons = [];
+  let selectedSeasonIds = new Set();
+  let allPlayers = [];
+  let legState = {};
+  for(let i = 1; i <= 9; i++){ legState[i] = 'Win'; }
+  let legWonState = {};
+  for(let i = 1; i <= 9; i++){ legWonState[i] = false; }
+  let firstVisitWinState = {};
+  for(let i = 1; i <= 9; i++){ firstVisitWinState[i] = false; }
+
+  function formatDMY(d){
+    const dd = String(d.getDate()).padStart(2, '0');
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    return `${dd}/${mm}/${yyyy}`;
+  }
+
+  function nextMatchDate(){
+    // Thursday = day 4 (Sunday = 0)
+    const d = new Date();
+    const dayOfWeek = d.getDay();
+    if(dayOfWeek === 4){
+      return formatDMY(d);
+    }
+    const daysUntilThursday = (4 - dayOfWeek + 7) % 7 || 7;
+    d.setDate(d.getDate() + daysUntilThursday);
+    return formatDMY(d);
+  }
+  dateInput.value = nextMatchDate();
+
+  // ---------- Build the 9 leg sections ----------
+  function buildLegRows(){
+    legRows.innerHTML = '';
+    for(let i = 1; i <= 9; i++){
+      const section = document.createElement('div');
+      section.className = 'leg-section';
+      section.innerHTML = `
+        <div class="leg-section-title">Leg ${i}</div>
+        <div class="leg-section-field">
+          <label>Player</label>
+          <select class="player-select" data-leg="${i}">
+            <option value="">— none —</option>
+          </select>
+        </div>
+        <div class="leg-section-field">
+          <label>Result</label>
+          <div class="leg-result-toggle" data-leg="${i}">
+            <button type="button" class="leg-result-btn selected win" data-value="Win">Win</button>
+            <button type="button" class="leg-result-btn" data-value="Lose">Lose</button>
+          </div>
+        </div>
+        <div class="leg-section-field">
+          <div class="checkbox-row">
+            <div class="checkbox-item">
+              <input type="checkbox" id="legWon-${i}" class="leg-won-checkbox" data-leg="${i}">
+              <label for="legWon-${i}">Lag Won</label>
+            </div>
+            <div class="checkbox-item">
+              <input type="checkbox" id="firstVisit-${i}" class="first-visit-checkbox" data-leg="${i}">
+              <label for="firstVisit-${i}">First Visit Win</label>
+            </div>
+          </div>
+        </div>
+      `;
+      legRows.appendChild(section);
+    }
+    wireLegResultToggles();
+    wireLegWonCheckboxes();
+    wireFirstVisitCheckboxes();
+    populatePlayerSelects();
+  }
+
+  function wireLegWonCheckboxes(){
+    document.querySelectorAll('.leg-won-checkbox').forEach(cb => {
+      cb.addEventListener('change', () => {
+        legWonState[cb.dataset.leg] = cb.checked;
+      });
+    });
+  }
+
+  function wireFirstVisitCheckboxes(){
+    document.querySelectorAll('.first-visit-checkbox').forEach(cb => {
+      cb.addEventListener('change', () => {
+        firstVisitWinState[cb.dataset.leg] = cb.checked;
+      });
+    });
+  }
+
+  function wireLegResultToggles(){
+    document.querySelectorAll('.leg-result-toggle').forEach(group => {
+      const leg = group.dataset.leg;
+      group.querySelectorAll('.leg-result-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          group.querySelectorAll('.leg-result-btn').forEach(b => b.classList.remove('selected', 'lose', 'win'));
+          btn.classList.add('selected');
+          if(btn.dataset.value === 'Lose'){ btn.classList.add('lose'); }
+          if(btn.dataset.value === 'Win'){ btn.classList.add('win'); }
+          legState[leg] = btn.dataset.value;
+        });
+      });
+    });
+  }
+
+  function populatePlayerSelects(){
+    const options = '<option value="">— none —</option>' + allPlayers.map(name =>
+      `<option value="${name}">${name}</option>`
+    ).join('');
+    document.querySelectorAll('.player-select').forEach(sel => {
+      const prev = sel.value;
+      sel.innerHTML = options;
+      if(prev){ sel.value = prev; }
+    });
+  }
+
+  function resetLegRows(){
+    document.querySelectorAll('.player-select').forEach(sel => { sel.selectedIndex = 0; });
+    document.querySelectorAll('.leg-result-toggle').forEach(group => {
+      const leg = group.dataset.leg;
+      group.querySelectorAll('.leg-result-btn').forEach(b => b.classList.remove('selected', 'lose', 'win'));
+      const winBtn = group.querySelector('.leg-result-btn[data-value="Win"]');
+      winBtn.classList.add('selected', 'win');
+      legState[leg] = 'Win';
+    });
+    document.querySelectorAll('.leg-won-checkbox').forEach(cb => {
+      cb.checked = false;
+      legWonState[cb.dataset.leg] = false;
+    });
+    document.querySelectorAll('.first-visit-checkbox').forEach(cb => {
+      cb.checked = false;
+      firstVisitWinState[cb.dataset.leg] = false;
+    });
+  }
+
+  buildLegRows();
+
+  // ---------- Venues (shared Home/Away list) ----------
+  function loadVenues(){
+    if(venuesLoaded) return;
+    venuesLoaded = true;
+    db.collection('venues').orderBy('name', 'asc').onSnapshot((snapshot) => {
+      allVenues = snapshot.docs.map(doc => ({ id: doc.id, name: doc.data().name }));
+
+      const prevHome = homeTeamSelect.value;
+      const prevAway = awayTeamSelect.value;
+
+      if(allVenues.length === 0){
+        homeTeamSelect.innerHTML = '<option value="">No venues yet</option>';
+        awayTeamSelect.innerHTML = '<option value="">No venues yet</option>';
+      } else {
+        const options = '<option value="">Select…</option>' + allVenues.map(v =>
+          `<option value="${v.name}">${v.name}</option>`
+        ).join('');
+        homeTeamSelect.innerHTML = options;
+        awayTeamSelect.innerHTML = options;
+        if(prevHome){ homeTeamSelect.value = prevHome; }
+        if(prevAway){ awayTeamSelect.value = prevAway; }
+      }
+      renderManageVenuesList();
+    });
+  }
+
+  function renderManageVenuesList(){
+    if(allVenues.length === 0){
+      manageVenuesList.innerHTML = '<div class="manage-empty">No venues added yet.</div>';
+    } else {
+      manageVenuesList.innerHTML = allVenues.map(v => `
+        <div class="manage-team-row">
+          <input type="checkbox" data-id="${v.id}" ${selectedVenueIds.has(v.id) ? 'checked' : ''}>
+          <span>${v.name}</span>
+        </div>
+      `).join('');
+    }
+    deleteVenuesBtn.disabled = selectedVenueIds.size === 0;
+    deleteVenuesBtn.textContent = selectedVenueIds.size > 0 ? `Delete Selected (${selectedVenueIds.size})` : 'Delete Selected';
+  }
+
+  manageVenuesToggle.addEventListener('click', () => manageVenuesPanel.classList.toggle('hidden'));
+
+  manageVenuesList.addEventListener('change', (e) => {
+    if(e.target.matches('input[type="checkbox"]')){
+      const id = e.target.dataset.id;
+      if(e.target.checked){ selectedVenueIds.add(id); } else { selectedVenueIds.delete(id); }
+      deleteVenuesBtn.disabled = selectedVenueIds.size === 0;
+      deleteVenuesBtn.textContent = selectedVenueIds.size > 0 ? `Delete Selected (${selectedVenueIds.size})` : 'Delete Selected';
+    }
+  });
+
+  addVenueBtn.addEventListener('click', async () => {
+    const name = newVenueName.value.trim();
+    manageVenuesMsg.textContent = '';
+    if(!name) return;
+    const exists = allVenues.some(v => v.name.toLowerCase() === name.toLowerCase());
+    if(exists){
+      manageVenuesMsg.style.color = '#ff8a80';
+      manageVenuesMsg.textContent = 'That venue already exists.';
+      return;
+    }
+    try{
+      await db.collection('venues').add({ name, createdAt: Date.now() });
+      newVenueName.value = '';
+      manageVenuesMsg.style.color = '#8fd19e';
+      manageVenuesMsg.textContent = 'Venue added.';
+      setTimeout(() => { manageVenuesMsg.textContent = ''; }, 2000);
+    } catch(e){
+      manageVenuesMsg.style.color = '#ff8a80';
+      manageVenuesMsg.textContent = 'Could not add — make sure you are signed in as admin.';
+    }
+  });
+  newVenueName.addEventListener('keydown', (e) => { if(e.key === 'Enter') addVenueBtn.click(); });
+
+  deleteVenuesBtn.addEventListener('click', () => {
+    if(selectedVenueIds.size === 0) return;
+    const names = allVenues.filter(v => selectedVenueIds.has(v.id)).map(v => v.name).join(', ');
+    venueDeleteConfirmMessage.textContent = `Remove ${selectedVenueIds.size} venue${selectedVenueIds.size === 1 ? '' : 's'} (${names})? This won't affect results already saved.`;
+    venueDeleteConfirmOverlay.classList.add('show');
+  });
+  venueDeleteConfirmNo.addEventListener('click', () => venueDeleteConfirmOverlay.classList.remove('show'));
+  venueDeleteConfirmYes.addEventListener('click', async () => {
+    const idsToDelete = Array.from(selectedVenueIds);
+    selectedVenueIds.clear();
+    venueDeleteConfirmOverlay.classList.remove('show');
+    try{
+      const batch = db.batch();
+      idsToDelete.forEach(id => batch.delete(db.collection('venues').doc(id)));
+      await batch.commit();
+    } catch(e){
+      manageVenuesMsg.style.color = '#ff8a80';
+      manageVenuesMsg.textContent = 'Could not delete — please try again.';
+    }
+  });
+
+  // ---------- Seasons (single dropdown list) ----------
+  function loadSeasons(){
+    if(seasonsLoaded) return;
+    seasonsLoaded = true;
+    db.collection('seasons').orderBy('name', 'asc').onSnapshot((snapshot) => {
+      allSeasons = snapshot.docs.map(doc => ({ id: doc.id, name: doc.data().name }));
+
+      const prevValue = seasonSelect.value;
+
+      if(allSeasons.length === 0){
+        seasonSelect.innerHTML = '<option value="">No seasons yet</option>';
+      } else {
+        seasonSelect.innerHTML = '<option value="">Select season…</option>' + allSeasons.map(s =>
+          `<option value="${s.name}">${s.name}</option>`
+        ).join('');
+        if(prevValue){ seasonSelect.value = prevValue; }
+      }
+      renderManageSeasonsList();
+    });
+  }
+
+  function renderManageSeasonsList(){
+    if(allSeasons.length === 0){
+      manageSeasonsList.innerHTML = '<div class="manage-empty">No seasons added yet.</div>';
+    } else {
+      manageSeasonsList.innerHTML = allSeasons.map(s => `
+        <div class="manage-team-row">
+          <input type="checkbox" data-id="${s.id}" ${selectedSeasonIds.has(s.id) ? 'checked' : ''}>
+          <span>${s.name}</span>
+        </div>
+      `).join('');
+    }
+    deleteSeasonsBtn.disabled = selectedSeasonIds.size === 0;
+    deleteSeasonsBtn.textContent = selectedSeasonIds.size > 0 ? `Delete Selected (${selectedSeasonIds.size})` : 'Delete Selected';
+  }
+
+  manageSeasonsToggle.addEventListener('click', () => manageSeasonsPanel.classList.toggle('hidden'));
+
+  manageSeasonsList.addEventListener('change', (e) => {
+    if(e.target.matches('input[type="checkbox"]')){
+      const id = e.target.dataset.id;
+      if(e.target.checked){ selectedSeasonIds.add(id); } else { selectedSeasonIds.delete(id); }
+      deleteSeasonsBtn.disabled = selectedSeasonIds.size === 0;
+      deleteSeasonsBtn.textContent = selectedSeasonIds.size > 0 ? `Delete Selected (${selectedSeasonIds.size})` : 'Delete Selected';
+    }
+  });
+
+  addSeasonBtn.addEventListener('click', async () => {
+    const name = newSeasonName.value.trim();
+    manageSeasonsMsg.textContent = '';
+    if(!name) return;
+    const exists = allSeasons.some(s => s.name.toLowerCase() === name.toLowerCase());
+    if(exists){
+      manageSeasonsMsg.style.color = '#ff8a80';
+      manageSeasonsMsg.textContent = 'That season already exists.';
+      return;
+    }
+    try{
+      await db.collection('seasons').add({ name, createdAt: Date.now() });
+      newSeasonName.value = '';
+      manageSeasonsMsg.style.color = '#8fd19e';
+      manageSeasonsMsg.textContent = 'Season added.';
+      setTimeout(() => { manageSeasonsMsg.textContent = ''; }, 2000);
+    } catch(e){
+      manageSeasonsMsg.style.color = '#ff8a80';
+      manageSeasonsMsg.textContent = 'Could not add — make sure you are signed in as admin.';
+    }
+  });
+  newSeasonName.addEventListener('keydown', (e) => { if(e.key === 'Enter') addSeasonBtn.click(); });
+
+  deleteSeasonsBtn.addEventListener('click', () => {
+    if(selectedSeasonIds.size === 0) return;
+    const names = allSeasons.filter(s => selectedSeasonIds.has(s.id)).map(s => s.name).join(', ');
+    seasonDeleteConfirmMessage.textContent = `Remove ${selectedSeasonIds.size} season${selectedSeasonIds.size === 1 ? '' : 's'} (${names})? This won't affect results already saved.`;
+    seasonDeleteConfirmOverlay.classList.add('show');
+  });
+  seasonDeleteConfirmNo.addEventListener('click', () => seasonDeleteConfirmOverlay.classList.remove('show'));
+  seasonDeleteConfirmYes.addEventListener('click', async () => {
+    const idsToDelete = Array.from(selectedSeasonIds);
+    selectedSeasonIds.clear();
+    seasonDeleteConfirmOverlay.classList.remove('show');
+    try{
+      const batch = db.batch();
+      idsToDelete.forEach(id => batch.delete(db.collection('seasons').doc(id)));
+      await batch.commit();
+    } catch(e){
+      manageSeasonsMsg.style.color = '#ff8a80';
+      manageSeasonsMsg.textContent = 'Could not delete — please try again.';
+    }
+  });
+
+  // ---------- Players ----------
+  function loadPlayers(){
+    if(playersLoaded) return;
+    playersLoaded = true;
+    db.collection('players').orderBy('name', 'asc').onSnapshot((snapshot) => {
+      allPlayers = snapshot.docs.map(doc => doc.data().name);
+      populatePlayerSelects();
+    });
+  }
+
+  // ---------- Results for date ----------
+  let resultsUnsubscribe = null;
+  let selectedResultIds = new Set();
+
+  function renderResultsList(entries){
+    if(entries.length === 0){
+      resultsList.innerHTML = '';
+      resultsEmpty.classList.remove('hidden');
+      resultsDeleteBar.classList.add('hidden');
+      return;
+    }
+    resultsEmpty.classList.add('hidden');
+    resultsDeleteBar.classList.remove('hidden');
+    resultsList.innerHTML = entries.map(e => `
+      <div class="result-row">
+        <input type="checkbox" class="rr-check" data-id="${e.id}" ${selectedResultIds.has(e.id) ? 'checked' : ''} title="Select for deletion">
+        <div style="flex:1; min-width:0;">
+          <div class="rr-name">${e.playerName}</div>
+          <div class="rr-meta">Leg ${e.leg} · ${e.homeTeam || '—'} vs ${e.awayTeam || '—'}</div>
+        </div>
+        <span class="rr-badge ${e.result === 'Win' ? 'win' : 'lose'}">${e.result}</span>
+      </div>
+    `).join('');
+    updateDeleteBtnState();
+  }
+
+  function updateDeleteBtnState(){
+    deleteResultsBtn.disabled = selectedResultIds.size === 0;
+    deleteResultsBtn.textContent = selectedResultIds.size > 0 ? `Delete (${selectedResultIds.size})` : 'Delete';
+  }
+
+  resultsList.addEventListener('change', (e) => {
+    if(e.target.matches('.rr-check')){
+      const id = e.target.dataset.id;
+      if(e.target.checked){ selectedResultIds.add(id); } else { selectedResultIds.delete(id); }
+      updateDeleteBtnState();
+    }
+  });
+
+  deleteResultsBtn.addEventListener('click', () => {
+    if(selectedResultIds.size === 0) return;
+    deleteConfirmMessage.textContent = `Remove ${selectedResultIds.size} selected result${selectedResultIds.size === 1 ? '' : 's'}? This cannot be undone.`;
+    deleteConfirmOverlay.classList.add('show');
+  });
+  deleteConfirmNo.addEventListener('click', () => deleteConfirmOverlay.classList.remove('show'));
+  deleteConfirmYes.addEventListener('click', async () => {
+    const idsToDelete = Array.from(selectedResultIds);
+    selectedResultIds.clear();
+    deleteConfirmOverlay.classList.remove('show');
+    try{
+      const batch = db.batch();
+      idsToDelete.forEach(id => batch.delete(db.collection('results').doc(id)));
+      await batch.commit();
+    } catch(e){
+      resultsEmpty.textContent = 'Could not delete — please try again.';
+    }
+  });
+
+  function subscribeToResultsForDate(dateStr){
+    if(resultsUnsubscribe) resultsUnsubscribe();
+    selectedResultIds.clear();
+    resultsDateLabel.textContent = dateStr || '—';
+    if(!/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)){
+      renderResultsList([]);
+      return;
+    }
+    resultsUnsubscribe = db.collection('results')
+      .where('matchDate', '==', dateStr)
+      .onSnapshot((snapshot) => {
+        const entries = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        entries.sort((a, b) => Number(a.leg) - Number(b.leg));
+        renderResultsList(entries);
+      }, () => {
+        resultsList.innerHTML = '';
+        resultsEmpty.textContent = 'Could not load results for this date.';
+        resultsEmpty.classList.remove('hidden');
+      });
+  }
+  dateInput.addEventListener('input', () => subscribeToResultsForDate(dateInput.value.trim()));
+
+  // ---------- Auth gate ----------
+  auth.onAuthStateChanged((user) => {
+    if(user){
+      notAdminView.classList.add('hidden');
+      formView.classList.remove('hidden');
+      resultsCard.classList.remove('hidden');
+      loadPlayers();
+      loadVenues();
+      loadSeasons();
+      subscribeToResultsForDate(dateInput.value.trim());
+    } else {
+      formView.classList.add('hidden');
+      resultsCard.classList.add('hidden');
+      notAdminView.classList.remove('hidden');
+    }
+  });
+
+  // ---------- Save flow ----------
+  submitBtn.addEventListener('click', () => {
+    formMsg.textContent = '';
+    const matchDate = dateInput.value.trim();
+    const season = seasonSelect.value;
+    const homeTeam = homeTeamSelect.value;
+    const awayTeam = awayTeamSelect.value;
+
+    if(!/^\d{2}\/\d{2}\/\d{4}$/.test(matchDate)){
+      formMsg.style.color = '#ff8a80';
+      formMsg.textContent = 'Please enter the date as dd/mm/yyyy.';
+      return;
+    }
+    if(!season){
+      formMsg.style.color = '#ff8a80';
+      formMsg.textContent = 'Please select a season.';
+      return;
+    }
+    if(!homeTeam || !awayTeam){
+      formMsg.style.color = '#ff8a80';
+      formMsg.textContent = 'Please select both a Home and Away team.';
+      return;
+    }
+
+    const legEntries = [];
+    let missingPlayers = 0;
+    document.querySelectorAll('.player-select').forEach(sel => {
+      const leg = sel.dataset.leg;
+      const playerName = sel.value;
+      if(playerName){
+        legEntries.push({ leg: Number(leg), playerName, result: legState[leg], legWon: legWonState[leg], firstVisitWin: firstVisitWinState[leg] });
+      } else {
+        missingPlayers++;
+      }
+    });
+
+    if(missingPlayers > 0){
+      formMsg.style.color = '#ff8a80';
+      formMsg.textContent = `Please select a player for all 9 legs (${missingPlayers} still missing).`;
+      return;
+    }
+
+    confirmSummary.textContent = `${matchDate} · Season ${season} · ${homeTeam} vs ${awayTeam} · ${legEntries.length} leg${legEntries.length === 1 ? '' : 's'} to save`;
+    confirmOverlay.classList.add('show');
+  });
+
+  confirmNo.addEventListener('click', () => confirmOverlay.classList.remove('show'));
+
+  confirmYes.addEventListener('click', async () => {
+    const matchDate = dateInput.value.trim();
+    const season = seasonSelect.value;
+    const homeTeam = homeTeamSelect.value;
+    const awayTeam = awayTeamSelect.value;
+    confirmOverlay.classList.remove('show');
+
+    const legEntries = [];
+    document.querySelectorAll('.player-select').forEach(sel => {
+      const leg = sel.dataset.leg;
+      const playerName = sel.value;
+      if(playerName){
+        legEntries.push({ leg: Number(leg), playerName, result: legState[leg], legWon: legWonState[leg], firstVisitWin: firstVisitWinState[leg] });
+      }
+    });
+
+    try{
+      const batch = db.batch();
+      legEntries.forEach(entry => {
+        const ref = db.collection('results').doc();
+        batch.set(ref, {
+          matchDate,
+          season,
+          homeTeam,
+          awayTeam,
+          playerName: entry.playerName,
+          leg: entry.leg,
+          result: entry.result,
+          legWon: entry.legWon,
+          firstVisitWin: entry.firstVisitWin,
+          createdAt: Date.now()
+        });
+      });
+      await batch.commit();
+      formMsg.style.color = '#8fd19e';
+      formMsg.textContent = `Saved ${legEntries.length} result${legEntries.length === 1 ? '' : 's'} for ${matchDate}.`;
+      resetLegRows();
+      subscribeToResultsForDate(dateInput.value);
+    } catch(e){
+      formMsg.style.color = '#ff8a80';
+      formMsg.textContent = 'Could not save — make sure you are signed in as admin.';
+    }
+  });
+</script>
+</body>
+</html>
