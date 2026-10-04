@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Match Results · Stapleford Monday Night Pool Team</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Barlow:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --baize: #0f5a3c;
+    --baize-dark: #08402a;
+    --rail: #5a2e1b;
+    --rail-light: #7a4127;
+    --brass: #d4a94f;
+    --chalk: #6fa8dc;
+    --ivory: #f5f0e1;
+    --red: #d22b2b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Barlow", "Helvetica Neue", Arial, sans-serif;
+    color: var(--ivory);
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(255,255,255,0.10), transparent 60%),
+      var(--baize);
+    display: flex;
+    justify-content: center;
+    padding: 40px 24px;
+    min-height: 100vh;
+  }
+
+  .table {
+    width: 100%;
+    max-width: 820px;
+    border: 22px solid var(--rail);
+    border-radius: 28px;
+    background:
+      repeating-linear-gradient(45deg, rgba(0,0,0,0.03) 0 2px, transparent 2px 4px),
+      linear-gradient(180deg, var(--baize) 0%, var(--baize-dark) 100%);
+    box-shadow:
+      inset 0 0 0 3px var(--rail-light),
+      inset 0 0 60px rgba(0,0,0,0.45),
+      0 20px 50px rgba(0,0,0,0.5);
+    padding: 40px 36px 48px;
+    position: relative;
+    align-self: flex-start;
+  }
+
+  .pocket {
+    position: absolute;
+    width: 34px; height: 34px;
+    background: #000;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px var(--rail-light);
+  }
+  .p1 { top: -28px; left: -28px; }
+  .p2 { top: -28px; right: -28px; }
+  .p3 { bottom: -28px; left: -28px; }
+  .p4 { bottom: -28px; right: -28px; }
+
+  .back {
+    display: inline-block;
+    color: var(--brass);
+    font-weight: 600;
+    text-decoration: none;
+    margin-bottom: 20px;
+  }
+  .back:hover { text-decoration: underline; }
+  .back:focus-visible { outline: 3px solid var(--chalk); outline-offset: 3px; border-radius: 4px; }
+
+  .heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+
+  h1 {
+    font-family: "Alfa Slab One", Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(2rem, 6vw, 3rem);
+    line-height: 1.05;
+    text-shadow: 0 3px 0 rgba(0,0,0,0.35);
+  }
+
+  .count {
+    opacity: 0.8;
+    margin-bottom: 28px;
+    font-size: 1.05rem;
+  }
+
+  .btn {
+    display: inline-block;
+    font: inherit;
+    font-weight: 700;
+    font-size: 1.05rem;
+    padding: 13px 24px;
+    border: none;
+    border-radius: 999px;
+    background: var(--ivory);
+    color: #1d1d1d;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: 0 5px 0 #b9b19b, 0 8px 14px rgba(0,0,0,0.35);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #b9b19b, 0 12px 18px rgba(0,0,0,0.4); }
+  .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #b9b19b, 0 3px 6px rgba(0,0,0,0.35); }
+  .btn:focus-visible { outline: 3px solid var(--chalk); outline-offset: 4px; }
+
+  /* Result cards */
+  .results { display: grid; gap: 14px; }
+
+  details.card {
+    background: rgba(0,0,0,0.22);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  summary {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    cursor: pointer;
+  }
+  summary::-webkit-details-marker { display: none; }
+  summary:focus-visible { outline: 3px solid var(--chalk); outline-offset: -3px; border-radius: 20px; }
+  summary:hover { background: rgba(255,255,255,0.04); }
+
+  .date {
+    font-size: 0.95rem;
+    color: var(--brass);
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .teams {
+    font-size: 1.2rem;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+  .teams .v { opacity: 0.6; font-weight: 400; margin: 0 6px; }
+
+  .score {
+    font-family: "Alfa Slab One", Georgia, serif;
+    font-size: 1.05rem;
+    border-radius: 999px;
+    padding: 6px 14px;
+    white-space: nowrap;
+    background: var(--ivory);
+    color: #1d1d1d;
+  }
+  .score.won { background: var(--brass); }
+  .score.lost { background: rgba(245,240,225,0.2); color: var(--ivory); }
+
+  .chevron {
+    width: 12px; height: 12px;
+    border-right: 3px solid var(--ivory);
+    border-bottom: 3px solid var(--ivory);
+    transform: rotate(45deg);
+    margin: 0 4px 4px;
+    transition: transform 0.2s ease;
+    opacity: 0.8;
+  }
+  details[open] .chevron { transform: rotate(225deg); margin-bottom: -4px; }
+
+  .legs-wrap {
+    padding: 4px 20px 20px;
+    border-top: 1px solid rgba(245,240,225,0.12);
+  }
+
+  .legs {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    font-size: 1.05rem;
+  }
+  .legs th {
+    text-align: left;
+    font-weight: 600;
+    color: var(--brass);
+    padding: 6px 8px;
+    font-size: 0.95rem;
+  }
+  .legs td { padding: 8px; border-top: 1px solid rgba(245,240,225,0.08); }
+  .legs td:first-child, .legs th:first-child { width: 4rem; opacity: 0.8; }
+  .legs td:last-child, .legs th:last-child { text-align: right; }
+
+  .pill {
+    display: inline-block;
+    min-width: 4.2rem;
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border-radius: 999px;
+    padding: 3px 10px;
+  }
+  .pill.won { background: var(--brass); color: #1d1d1d; }
+  .pill.lost { background: rgba(245,240,225,0.15); }
+
+  .card-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+  }
+
+  .remove {
+    font: inherit;
+    font-weight: 600;
+    font-size: 0.95rem;
+    background: transparent;
+    color: var(--ivory);
+    border: 2px solid rgba(245,240,225,0.35);
+    border-radius: 999px;
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+  .remove:hover { border-color: var(--red); background: var(--red); }
+  .remove:focus-visible { outline: 3px solid var(--chalk); outline-offset: 3px; }
+
+  .message {
+    text-align: center;
+    padding: 28px 16px;
+    opacity: 0.85;
+    font-size: 1.05rem;
+    line-height: 1.5;
+  }
+  .error {
+    background: rgba(210,43,43,0.25);
+    border: 2px solid var(--red);
+    border-radius: 16px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    display: none;
+  }
+  .error.show { display: block; }
+
+  @media (max-width: 560px) {
+    .table { border-width: 14px; padding: 32px 18px 40px; }
+    summary { padding: 14px 16px; gap: 12px; }
+    .legs-wrap { padding: 4px 14px 16px; }
+    .pocket { width: 26px; height: 26px; }
+    .p1, .p3 { left: -21px; }
+    .p2, .p4 { right: -21px; }
+    .p1, .p2 { top: -21px; }
+    .p3, .p4 { bottom: -21px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn, .chevron { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<main class="table">
+  <div class="pocket p1"></div><div class="pocket p2"></div>
+  <div class="pocket p3"></div><div class="pocket p4"></div>
+
+  <a class="back" href="index.html">‹ Back to home</a>
+  <div class="heading">
+    <h1>Match Results</h1>
+    <a class="btn" href="addresult.html">Add result</a>
+  </div>
+  <p class="count" id="count">Loading results…</p>
+
+  <div class="error" id="error" role="alert"></div>
+
+  <div class="results" id="results" aria-live="polite"></div>
+</main>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getFirestore, collection, deleteDoc, doc, onSnapshot
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  // ── Firebase config ────────────────────────────────────────────
+  // Use the same values you put in team.html
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "stapleford-pool-monday-team.firebaseapp.com",
+    projectId: "stapleford-pool-monday-team",
+    storageBucket: "stapleford-pool-monday-team.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  const RESULTS_COLLECTION = "results";
+  // ───────────────────────────────────────────────────────────────
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const resultsRef = collection(db, RESULTS_COLLECTION);
+
+  const listEl = document.getElementById("results");
+  const countEl = document.getElementById("count");
+  const errorEl = document.getElementById("error");
+
+  // Remember which cards are open so live updates don't snap them shut
+  const openCards = new Set();
+
+  function showError(msg) { errorEl.textContent = msg; errorEl.classList.add("show"); }
+  function clearError() { errorEl.classList.remove("show"); }
+
+  function formatDate(iso) {
+    if (!iso) return "No date";
+    const d = new Date(iso + "T12:00:00");
+    if (isNaN(d)) return iso;
+    return d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+  }
+
+  function el(tag, className, text) {
+    const e = document.createElement(tag);
+    if (className) e.className = className;
+    if (text !== undefined) e.textContent = text;
+    return e;
+  }
+
+  function render(results) {
+    listEl.innerHTML = "";
+    countEl.textContent = results.length === 1 ? "1 match" : `${results.length} matches`;
+
+    if (results.length === 0) {
+      listEl.appendChild(el("p", "message", "No results yet. Use Add result to enter the first match."));
+      return;
+    }
+
+    results.forEach((r) => {
+      const legs = Array.isArray(r.legs) ? r.legs : [];
+      const won = legs.filter(l => l.won === true).length;
+      const lost = legs.filter(l => l.won === false).length;
+      const outcome = won > lost ? "won" : won < lost ? "lost" : "";
+
+      const card = el("details", "card");
+      if (openCards.has(r.id)) card.open = true;
+      card.addEventListener("toggle", () => {
+        card.open ? openCards.add(r.id) : openCards.delete(r.id);
+      });
+
+      // Collapsed header
+      const summary = el("summary");
+      const info = el("div");
+      info.appendChild(el("div", "date", formatDate(r.date)));
+      const teams = el("div", "teams");
+      teams.append(r.homeTeam || "Home", el("span", "v", "v"), r.awayTeam || "Away");
+      info.appendChild(teams);
+
+      const scoreText = outcome === "won" ? `Won ${won}–${lost}` : outcome === "lost" ? `Lost ${won}–${lost}` : `${won}–${lost}`;
+      const score = el("span", "score " + outcome, scoreText);
+      score.setAttribute("aria-label", `Legs won ${won}, legs lost ${lost}`);
+
+      summary.append(info, score, el("span", "chevron"));
+      card.appendChild(summary);
+
+      // Expanded leg-by-leg breakdown
+      const wrap = el("div", "legs-wrap");
+      const table = el("table", "legs");
+      const thead = el("thead");
+      const hr = el("tr");
+      ["Leg", "Player", "Result"].forEach(h => hr.appendChild(el("th", "", h)));
+      thead.appendChild(hr);
+      table.appendChild(thead);
+
+      const tbody = el("tbody");
+      legs.forEach((leg, i) => {
+        const tr = el("tr");
+        tr.appendChild(el("td", "", String(i + 1)));
+        tr.appendChild(el("td", "", leg.player || "—"));
+        const td = el("td");
+        if (leg.won === true) td.appendChild(el("span", "pill won", "Won"));
+        else if (leg.won === false) td.appendChild(el("span", "pill lost", "Lost"));
+        else td.textContent = "—";
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      wrap.appendChild(table);
+
+      const actions = el("div", "card-actions");
+      const remove = el("button", "remove", "Remove result");
+      remove.type = "button";
+      remove.addEventListener("click", async () => {
+        const label = `${r.homeTeam} v ${r.awayTeam} on ${formatDate(r.date)}`;
+        if (!confirm(`Remove the result for ${label}?`)) return;
+        clearError();
+        try {
+          await deleteDoc(doc(db, RESULTS_COLLECTION, r.id));
+          openCards.delete(r.id);
+        } catch (err) {
+          console.error(err);
+          showError("Couldn't remove that result. Check your Firestore rules allow deletes.");
+        }
+      });
+      actions.appendChild(remove);
+      wrap.appendChild(actions);
+
+      card.appendChild(wrap);
+      listEl.appendChild(card);
+    });
+  }
+
+  // Live listener, newest match first
+  onSnapshot(
+    resultsRef,
+    (snapshot) => {
+      clearError();
+      const results = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+      results.sort((a, b) => (b.date || "").localeCompare(a.date || ""));
+      render(results);
+    },
+    (err) => {
+      console.error(err);
+      countEl.textContent = "Couldn't load results";
+      showError("Couldn't connect to Firebase. Check the config values in results.html and your Firestore rules.");
+    }
+  );
+</script>
+
+</body>
+</html>
