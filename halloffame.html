@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hall Of Fame · Stapleford Monday Night Pool Team</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Barlow:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --baize: #0f5a3c;
+    --baize-dark: #08402a;
+    --rail: #5a2e1b;
+    --rail-light: #7a4127;
+    --brass: #d4a94f;
+    --chalk: #6fa8dc;
+    --ivory: #f5f0e1;
+    --red: #d22b2b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Barlow", "Helvetica Neue", Arial, sans-serif;
+    color: var(--ivory);
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(255,255,255,0.10), transparent 60%),
+      var(--baize);
+    display: flex;
+    justify-content: center;
+    padding: 40px 24px;
+    min-height: 100vh;
+  }
+
+  .table {
+    width: 100%;
+    max-width: 820px;
+    border: 22px solid var(--rail);
+    border-radius: 28px;
+    background:
+      repeating-linear-gradient(45deg, rgba(0,0,0,0.03) 0 2px, transparent 2px 4px),
+      linear-gradient(180deg, var(--baize) 0%, var(--baize-dark) 100%);
+    box-shadow:
+      inset 0 0 0 3px var(--rail-light),
+      inset 0 0 60px rgba(0,0,0,0.45),
+      0 20px 50px rgba(0,0,0,0.5);
+    padding: 40px 36px 48px;
+    position: relative;
+    align-self: flex-start;
+  }
+
+  .pocket {
+    position: absolute;
+    width: 34px; height: 34px;
+    background: #000;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px var(--rail-light);
+  }
+  .p1 { top: -28px; left: -28px; }
+  .p2 { top: -28px; right: -28px; }
+  .p3 { bottom: -28px; left: -28px; }
+  .p4 { bottom: -28px; right: -28px; }
+
+  .back {
+    display: inline-block;
+    color: var(--brass);
+    font-weight: 600;
+    text-decoration: none;
+    margin-bottom: 20px;
+  }
+  .back:hover { text-decoration: underline; }
+  .back:focus-visible { outline: 3px solid var(--chalk); outline-offset: 3px; border-radius: 4px; }
+
+  h1 {
+    font-family: "Alfa Slab One", Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(2rem, 6vw, 3rem);
+    line-height: 1.05;
+    text-shadow: 0 3px 0 rgba(0,0,0,0.35);
+    margin-bottom: 8px;
+  }
+
+  .count {
+    opacity: 0.8;
+    margin-bottom: 28px;
+    font-size: 1.05rem;
+  }
+
+  /* Add entry form */
+  .add {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr 1fr auto;
+    gap: 12px;
+    margin-bottom: 28px;
+    align-items: end;
+  }
+
+  .field { display: flex; flex-direction: column; gap: 6px; }
+
+  .field label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--brass);
+    padding-left: 14px;
+  }
+
+  .field input {
+    width: 100%;
+    font: inherit;
+    font-size: 1.05rem;
+    padding: 13px 18px;
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background: rgba(0,0,0,0.25);
+    color: var(--ivory);
+  }
+  .field input::placeholder { color: rgba(245,240,225,0.5); }
+  .field input:focus { outline: none; border-color: var(--chalk); }
+
+  .btn {
+    font: inherit;
+    font-weight: 700;
+    font-size: 1.05rem;
+    padding: 13px 24px;
+    border: none;
+    border-radius: 999px;
+    background: var(--ivory);
+    color: #1d1d1d;
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: 0 5px 0 #b9b19b, 0 8px 14px rgba(0,0,0,0.35);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #b9b19b, 0 12px 18px rgba(0,0,0,0.4); }
+  .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #b9b19b, 0 3px 6px rgba(0,0,0,0.35); }
+  .btn:focus-visible { outline: 3px solid var(--chalk); outline-offset: 4px; }
+  .btn:disabled { opacity: 0.6; cursor: wait; }
+
+  /* Honours list */
+  ul { list-style: none; display: grid; gap: 12px; }
+
+  .entry {
+    display: grid;
+    grid-template-columns: 7rem 1fr auto auto;
+    align-items: center;
+    gap: 16px;
+    background: rgba(0,0,0,0.22);
+    border-radius: 999px;
+    padding: 10px 10px 10px 24px;
+  }
+
+  .season {
+    font-family: "Alfa Slab One", Georgia, serif;
+    font-size: 1.1rem;
+    color: var(--brass);
+  }
+
+  .division {
+    font-size: 1.15rem;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+
+  .placement {
+    font-weight: 700;
+    background: var(--ivory);
+    color: #1d1d1d;
+    border-radius: 999px;
+    padding: 6px 14px;
+    white-space: nowrap;
+  }
+  .placement.gold { background: var(--brass); }
+
+  .remove {
+    font: inherit;
+    font-weight: 600;
+    font-size: 0.95rem;
+    background: transparent;
+    color: var(--ivory);
+    border: 2px solid rgba(245,240,225,0.35);
+    border-radius: 999px;
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+  .remove:hover { border-color: var(--red); background: var(--red); }
+  .remove:focus-visible { outline: 3px solid var(--chalk); outline-offset: 3px; }
+
+  .message {
+    text-align: center;
+    padding: 28px 16px;
+    opacity: 0.85;
+    font-size: 1.05rem;
+    line-height: 1.5;
+  }
+  .error {
+    background: rgba(210,43,43,0.25);
+    border: 2px solid var(--red);
+    border-radius: 16px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    display: none;
+  }
+  .error.show { display: block; }
+
+  @media (max-width: 680px) {
+    .add { grid-template-columns: 1fr 1fr; }
+    .add .field.division-field { grid-column: 1 / -1; order: -1; }
+    .add .btn { grid-column: 1 / -1; }
+    .entry {
+      grid-template-columns: 1fr auto;
+      border-radius: 20px;
+      padding: 14px 14px 14px 20px;
+      row-gap: 8px;
+    }
+    .season { grid-column: 1; }
+    .placement { grid-column: 2; grid-row: 1; justify-self: end; }
+    .division { grid-column: 1; }
+    .remove { grid-column: 2; grid-row: 2; }
+  }
+
+  @media (max-width: 560px) {
+    .table { border-width: 14px; padding: 32px 18px 40px; }
+    .pocket { width: 26px; height: 26px; }
+    .p1, .p3 { left: -21px; }
+    .p2, .p4 { right: -21px; }
+    .p1, .p2 { top: -21px; }
+    .p3, .p4 { bottom: -21px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<main class="table">
+  <div class="pocket p1"></div><div class="pocket p2"></div>
+  <div class="pocket p3"></div><div class="pocket p4"></div>
+
+  <a class="back" href="index.html">‹ Back to home</a>
+  <h1>Hall Of Fame</h1>
+  <p class="count" id="count">Loading honours…</p>
+
+  <form class="add" id="addForm" autocomplete="off">
+    <div class="field">
+      <label for="season">Season</label>
+      <input id="season" type="text" placeholder="2025/26" maxlength="20" required>
+    </div>
+    <div class="field division-field">
+      <label for="division">Division</label>
+      <input id="division" type="text" placeholder="Division 1" maxlength="60" required>
+    </div>
+    <div class="field">
+      <label for="placement">Placement</label>
+      <input id="placement" type="text" placeholder="1st" maxlength="30" list="placementOptions" required>
+      <datalist id="placementOptions">
+        <option value="1st"></option>
+        <option value="2nd"></option>
+        <option value="3rd"></option>
+        <option value="4th"></option>
+        <option value="Cup winners"></option>
+        <option value="Cup runners-up"></option>
+      </datalist>
+    </div>
+    <button class="btn" type="submit" id="addBtn">Add entry</button>
+  </form>
+
+  <div class="error" id="error" role="alert"></div>
+
+  <ul id="honoursList" aria-live="polite"></ul>
+</main>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getFirestore, collection, addDoc, deleteDoc, doc,
+    onSnapshot, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  // ── Firebase config ────────────────────────────────────────────
+  // Use the same values you put in team.html
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "stapleford-pool-monday-team.firebaseapp.com",
+    projectId: "stapleford-pool-monday-team",
+    storageBucket: "stapleford-pool-monday-team.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  // Name of the Firestore collection holding the honours
+  const HONOURS_COLLECTION = "hallOfFame";
+  // ───────────────────────────────────────────────────────────────
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const honoursRef = collection(db, HONOURS_COLLECTION);
+
+  const listEl = document.getElementById("honoursList");
+  const countEl = document.getElementById("count");
+  const errorEl = document.getElementById("error");
+  const form = document.getElementById("addForm");
+  const seasonInput = document.getElementById("season");
+  const divisionInput = document.getElementById("division");
+  const placementInput = document.getElementById("placement");
+  const addBtn = document.getElementById("addBtn");
+
+  function showError(msg) {
+    errorEl.textContent = msg;
+    errorEl.classList.add("show");
+  }
+  function clearError() {
+    errorEl.classList.remove("show");
+  }
+
+  // Treat "1st", "Winners" or "Champions" as a title win and highlight it
+  function isWin(placement) {
+    const p = placement.trim().toLowerCase();
+    return p === "1st" || p === "1" || p.includes("winner") || p.includes("champion");
+  }
+
+  function render(entries) {
+    listEl.innerHTML = "";
+    countEl.textContent = entries.length === 1 ? "1 honour" : `${entries.length} honours`;
+
+    if (entries.length === 0) {
+      const li = document.createElement("li");
+      li.className = "message";
+      li.textContent = "No honours yet. Add the first season above.";
+      listEl.appendChild(li);
+      return;
+    }
+
+    entries.forEach((e) => {
+      const li = document.createElement("li");
+      li.className = "entry";
+
+      const season = document.createElement("span");
+      season.className = "season";
+      season.textContent = e.season;
+
+      const division = document.createElement("span");
+      division.className = "division";
+      division.textContent = e.division;
+
+      const placement = document.createElement("span");
+      placement.className = "placement" + (isWin(e.placement) ? " gold" : "");
+      placement.textContent = e.placement;
+
+      const remove = document.createElement("button");
+      remove.className = "remove";
+      remove.type = "button";
+      remove.textContent = "Remove";
+      const label = `${e.season} ${e.division} (${e.placement})`;
+      remove.setAttribute("aria-label", `Remove ${label}`);
+      remove.addEventListener("click", async () => {
+        if (!confirm(`Remove ${label} from the Hall Of Fame?`)) return;
+        clearError();
+        try {
+          await deleteDoc(doc(db, HONOURS_COLLECTION, e.id));
+        } catch (err) {
+          console.error(err);
+          showError("Couldn't remove that entry. Check your Firestore rules allow deletes.");
+        }
+      });
+
+      li.append(season, division, placement, remove);
+      listEl.appendChild(li);
+    });
+  }
+
+  // Live listener, newest season first, then division A-Z
+  onSnapshot(
+    honoursRef,
+    (snapshot) => {
+      clearError();
+      const entries = snapshot.docs.map(d => {
+        const data = d.data();
+        return {
+          id: d.id,
+          season: data.season || "",
+          division: data.division || "",
+          placement: data.placement || ""
+        };
+      });
+      entries.sort((a, b) =>
+        b.season.localeCompare(a.season, "en-GB", { numeric: true, sensitivity: "base" }) ||
+        a.division.localeCompare(b.division, "en-GB", { numeric: true, sensitivity: "base" })
+      );
+      render(entries);
+    },
+    (err) => {
+      console.error(err);
+      countEl.textContent = "Couldn't load honours";
+      showError("Couldn't connect to Firebase. Check the config values in halloffame.html and your Firestore rules.");
+    }
+  );
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const season = seasonInput.value.trim();
+    const division = divisionInput.value.trim();
+    const placement = placementInput.value.trim();
+    if (!season || !division || !placement) return;
+
+    clearError();
+    addBtn.disabled = true;
+    try {
+      await addDoc(honoursRef, { season, division, placement, createdAt: serverTimestamp() });
+      form.reset();
+      seasonInput.focus();
+    } catch (err) {
+      console.error(err);
+      showError("Couldn't add that entry. Check your Firestore rules allow writes.");
+    } finally {
+      addBtn.disabled = false;
+    }
+  });
+</script>
+
+</body>
+</html>
