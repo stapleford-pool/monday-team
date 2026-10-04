@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Team · Stapleford Monday Night Pool Team</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Barlow:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --baize: #0f5a3c;
+    --baize-dark: #08402a;
+    --rail: #5a2e1b;
+    --rail-light: #7a4127;
+    --brass: #d4a94f;
+    --chalk: #6fa8dc;
+    --ivory: #f5f0e1;
+    --red: #d22b2b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Barlow", "Helvetica Neue", Arial, sans-serif;
+    color: var(--ivory);
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(255,255,255,0.10), transparent 60%),
+      var(--baize);
+    display: flex;
+    justify-content: center;
+    padding: 40px 24px;
+    min-height: 100vh;
+  }
+
+  .table {
+    width: 100%;
+    max-width: 760px;
+    border: 22px solid var(--rail);
+    border-radius: 28px;
+    background:
+      repeating-linear-gradient(45deg, rgba(0,0,0,0.03) 0 2px, transparent 2px 4px),
+      linear-gradient(180deg, var(--baize) 0%, var(--baize-dark) 100%);
+    box-shadow:
+      inset 0 0 0 3px var(--rail-light),
+      inset 0 0 60px rgba(0,0,0,0.45),
+      0 20px 50px rgba(0,0,0,0.5);
+    padding: 40px 36px 48px;
+    position: relative;
+    align-self: flex-start;
+  }
+
+  .pocket {
+    position: absolute;
+    width: 34px; height: 34px;
+    background: #000;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px var(--rail-light);
+  }
+  .p1 { top: -28px; left: -28px; }
+  .p2 { top: -28px; right: -28px; }
+  .p3 { bottom: -28px; left: -28px; }
+  .p4 { bottom: -28px; right: -28px; }
+
+  .back {
+    display: inline-block;
+    color: var(--brass);
+    font-weight: 600;
+    text-decoration: none;
+    margin-bottom: 20px;
+  }
+  .back:hover { text-decoration: underline; }
+  .back:focus-visible { outline: 3px solid var(--chalk); outline-offset: 3px; border-radius: 4px; }
+
+  h1 {
+    font-family: "Alfa Slab One", Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(2rem, 6vw, 3rem);
+    line-height: 1.05;
+    text-shadow: 0 3px 0 rgba(0,0,0,0.35);
+    margin-bottom: 8px;
+  }
+
+  .count {
+    opacity: 0.8;
+    margin-bottom: 28px;
+    font-size: 1.05rem;
+  }
+
+  /* Add player form */
+  .add {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .add label {
+    position: absolute;
+    width: 1px; height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .add input {
+    flex: 1;
+    min-width: 0;
+    font: inherit;
+    font-size: 1.1rem;
+    padding: 14px 20px;
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background: rgba(0,0,0,0.25);
+    color: var(--ivory);
+  }
+  .add input::placeholder { color: rgba(245,240,225,0.55); }
+  .add input:focus { outline: none; border-color: var(--chalk); }
+
+  .btn {
+    font: inherit;
+    font-weight: 700;
+    font-size: 1.05rem;
+    padding: 14px 26px;
+    border: none;
+    border-radius: 999px;
+    background: var(--ivory);
+    color: #1d1d1d;
+    cursor: pointer;
+    box-shadow: 0 5px 0 #b9b19b, 0 8px 14px rgba(0,0,0,0.35);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #b9b19b, 0 12px 18px rgba(0,0,0,0.4); }
+  .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #b9b19b, 0 3px 6px rgba(0,0,0,0.35); }
+  .btn:focus-visible { outline: 3px solid var(--chalk); outline-offset: 4px; }
+  .btn:disabled { opacity: 0.6; cursor: wait; }
+
+  /* Player list */
+  ul { list-style: none; display: grid; gap: 12px; }
+
+  .player {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: rgba(0,0,0,0.22);
+    border-radius: 999px;
+    padding: 10px 10px 10px 24px;
+  }
+
+  .name {
+    flex: 1;
+    font-size: 1.2rem;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+
+  .remove {
+    font: inherit;
+    font-weight: 600;
+    font-size: 0.95rem;
+    background: transparent;
+    color: var(--ivory);
+    border: 2px solid rgba(245,240,225,0.35);
+    border-radius: 999px;
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+  .remove:hover { border-color: var(--red); background: var(--red); }
+  .remove:focus-visible { outline: 3px solid var(--chalk); outline-offset: 3px; }
+
+  .message {
+    text-align: center;
+    padding: 28px 16px;
+    opacity: 0.85;
+    font-size: 1.05rem;
+    line-height: 1.5;
+  }
+  .error {
+    background: rgba(210,43,43,0.25);
+    border: 2px solid var(--red);
+    border-radius: 16px;
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    display: none;
+  }
+  .error.show { display: block; }
+
+  @media (max-width: 560px) {
+    .table { border-width: 14px; padding: 32px 18px 40px; }
+    .add { flex-direction: column; }
+    .pocket { width: 26px; height: 26px; }
+    .p1, .p3 { left: -21px; }
+    .p2, .p4 { right: -21px; }
+    .p1, .p2 { top: -21px; }
+    .p3, .p4 { bottom: -21px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<main class="table">
+  <div class="pocket p1"></div><div class="pocket p2"></div>
+  <div class="pocket p3"></div><div class="pocket p4"></div>
+
+  <a class="back" href="index.html">‹ Back to home</a>
+  <h1>The Team</h1>
+  <p class="count" id="count">Loading players…</p>
+
+  <form class="add" id="addForm" autocomplete="off">
+    <label for="playerName">Player name</label>
+    <input id="playerName" type="text" placeholder="Player name" maxlength="60" required>
+    <button class="btn" type="submit" id="addBtn">Add player</button>
+  </form>
+
+  <div class="error" id="error" role="alert"></div>
+
+  <ul id="playerList" aria-live="polite"></ul>
+</main>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getFirestore, collection, addDoc, deleteDoc, doc,
+    onSnapshot, serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  // ── Firebase config ────────────────────────────────────────────
+  // Replace these values with the ones from:
+  // Firebase console → Project settings → Your apps → Web app → SDK setup and configuration
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "stapleford-pool-monday-team.firebaseapp.com",
+    projectId: "stapleford-pool-monday-team",
+    storageBucket: "stapleford-pool-monday-team.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  // Name of the Firestore collection holding the players
+  const PLAYERS_COLLECTION = "players";
+  // ───────────────────────────────────────────────────────────────
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const playersRef = collection(db, PLAYERS_COLLECTION);
+
+  const listEl = document.getElementById("playerList");
+  const countEl = document.getElementById("count");
+  const errorEl = document.getElementById("error");
+  const form = document.getElementById("addForm");
+  const input = document.getElementById("playerName");
+  const addBtn = document.getElementById("addBtn");
+
+  function showError(msg) {
+    errorEl.textContent = msg;
+    errorEl.classList.add("show");
+  }
+  function clearError() {
+    errorEl.classList.remove("show");
+  }
+
+  function render(players) {
+    listEl.innerHTML = "";
+    countEl.textContent = players.length === 1 ? "1 player" : `${players.length} players`;
+
+    if (players.length === 0) {
+      const li = document.createElement("li");
+      li.className = "message";
+      li.textContent = "No players yet. Add the first one above.";
+      listEl.appendChild(li);
+      return;
+    }
+
+    players.forEach((p) => {
+      const li = document.createElement("li");
+      li.className = "player";
+
+      const name = document.createElement("span");
+      name.className = "name";
+      name.textContent = p.name;
+
+      const remove = document.createElement("button");
+      remove.className = "remove";
+      remove.type = "button";
+      remove.textContent = "Remove";
+      remove.setAttribute("aria-label", `Remove ${p.name}`);
+      remove.addEventListener("click", async () => {
+        if (!confirm(`Remove ${p.name} from the team?`)) return;
+        clearError();
+        try {
+          await deleteDoc(doc(db, PLAYERS_COLLECTION, p.id));
+        } catch (err) {
+          console.error(err);
+          showError(`Couldn't remove ${p.name}. Check your Firestore rules allow deletes.`);
+        }
+      });
+
+      li.append(name, remove);
+      listEl.appendChild(li);
+    });
+  }
+
+  // Live listener: the list updates automatically whenever the collection changes
+  onSnapshot(
+    playersRef,
+    (snapshot) => {
+      clearError();
+      const players = snapshot.docs.map(d => ({
+        id: d.id,
+        name: d.data().name || d.id
+      }));
+      // Sort A-Z, ignoring upper/lower case
+      players.sort((a, b) => a.name.localeCompare(b.name, "en-GB", { sensitivity: "base" }));
+      render(players);
+    },
+    (err) => {
+      console.error(err);
+      countEl.textContent = "Couldn't load players";
+      showError("Couldn't connect to Firebase. Check the config values at the bottom of team.html and your Firestore rules.");
+    }
+  );
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name = input.value.trim();
+    if (!name) return;
+
+    clearError();
+    addBtn.disabled = true;
+    try {
+      await addDoc(playersRef, { name, createdAt: serverTimestamp() });
+      input.value = "";
+      input.focus();
+    } catch (err) {
+      console.error(err);
+      showError(`Couldn't add ${name}. Check your Firestore rules allow writes.`);
+    } finally {
+      addBtn.disabled = false;
+    }
+  });
+</script>
+
+</body>
+</html>
