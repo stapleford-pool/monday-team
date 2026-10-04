@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stapleford Monday Night Pool Team</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Barlow:wght@400;600;700&display=swap" rel="stylesheet">
+<script>
+  // Show the opening screen once per browser session
+  try {
+    if (sessionStorage.getItem("splashSeen")) document.documentElement.classList.add("no-splash");
+  } catch (e) {}
+</script>
+<style>
+  :root {
+    --baize: #0f5a3c;
+    --baize-dark: #08402a;
+    --rail: #5a2e1b;
+    --rail-light: #7a4127;
+    --brass: #d4a94f;
+    --chalk: #6fa8dc;
+    --ivory: #f5f0e1;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body { height: 100%; }
+
+  body {
+    font-family: "Barlow", "Helvetica Neue", Arial, sans-serif;
+    color: var(--ivory);
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(255,255,255,0.10), transparent 60%),
+      radial-gradient(circle at 20% 80%, rgba(0,0,0,0.25), transparent 50%),
+      var(--baize);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    min-height: 100vh;
+  }
+
+  /* The table: a wooden rail framing the felt */
+  .table {
+    width: 100%;
+    max-width: 880px;
+    border: 22px solid var(--rail);
+    border-radius: 28px;
+    background:
+      repeating-linear-gradient(45deg, rgba(0,0,0,0.03) 0 2px, transparent 2px 4px),
+      linear-gradient(180deg, var(--baize) 0%, var(--baize-dark) 100%);
+    box-shadow:
+      inset 0 0 0 3px var(--rail-light),
+      inset 0 0 60px rgba(0,0,0,0.45),
+      0 20px 50px rgba(0,0,0,0.5);
+    padding: 56px 40px 64px;
+    position: relative;
+    text-align: center;
+  }
+
+  /* Pockets at the corners and middle of the long rails */
+  .pocket {
+    position: absolute;
+    width: 34px; height: 34px;
+    background: #000;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px var(--rail-light);
+  }
+  .p1 { top: -28px; left: -28px; }
+  .p2 { top: -28px; right: -28px; }
+  .p3 { bottom: -28px; left: -28px; }
+  .p4 { bottom: -28px; right: -28px; }
+  .p5 { left: -30px; top: 50%; transform: translateY(-50%); }
+  .p6 { right: -30px; top: 50%; transform: translateY(-50%); }
+
+  /* Brass diamond sights on the rail */
+  .sight {
+    position: absolute;
+    width: 8px; height: 8px;
+    background: var(--brass);
+    transform: rotate(45deg);
+    top: -15px;
+  }
+
+  h1 {
+    font-family: "Alfa Slab One", Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(2rem, 6vw, 3.6rem);
+    line-height: 1.05;
+    text-shadow: 0 3px 0 rgba(0,0,0,0.35);
+  }
+
+  .title-block { margin-bottom: 40px; }
+
+  .latest-honour {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 14px;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--brass);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .latest-honour.show { opacity: 1; }
+  .latest-honour[hidden] { display: none; }
+  .latest-honour .sep {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--brass);
+    opacity: 0.7;
+  }
+
+  /* Command buttons */
+  nav {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+    max-width: 620px;
+    margin: 0 auto;
+  }
+
+  .btn {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 22px 14px 14px;
+    background: var(--ivory);
+    color: #1d1d1d;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.15rem;
+    border-radius: 999px;
+    box-shadow: 0 6px 0 #b9b19b, 0 10px 18px rgba(0,0,0,0.35);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    text-align: left;
+  }
+
+  .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 0 #b9b19b, 0 14px 22px rgba(0,0,0,0.4);
+  }
+
+  .btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 #b9b19b, 0 4px 8px rgba(0,0,0,0.35);
+  }
+
+  .btn:focus-visible {
+    outline: 3px solid var(--chalk);
+    outline-offset: 4px;
+  }
+
+  /* Each button carries a pool ball */
+  .ball {
+    flex: none;
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    position: relative;
+    box-shadow: inset -5px -6px 10px rgba(0,0,0,0.35), inset 4px 4px 8px rgba(255,255,255,0.35);
+  }
+  .ball span {
+    width: 24px; height: 24px;
+    background: #fff;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #111;
+  }
+  .b1 { background: #f2c230; }
+  .b2 { background: #1f4fb5; }
+  .b3 { background: #d22b2b; }
+  .b8 { background: #111; }
+  .b5 { background: #e8731c; }
+  .b6 { background: #1b7a3a; }
+
+
+  @media (max-width: 600px) {
+    .table { border-width: 14px; padding: 40px 20px 48px; }
+    nav { grid-template-columns: 1fr; }
+    .pocket { width: 26px; height: 26px; }
+    .p1, .p3 { left: -21px; }
+    .p2, .p4 { right: -21px; }
+    .p1, .p2 { top: -21px; }
+    .p3, .p4 { bottom: -21px; }
+    .p5 { left: -21px; }
+    .p6 { right: -21px; }
+    .sight { display: none; }
+  }
+
+  /* Opening screen */
+  .splash {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: grid;
+    place-items: center;
+    background:
+      radial-gradient(ellipse at 50% 45%, rgba(255,255,255,0.12), transparent 60%),
+      var(--baize-dark);
+    cursor: pointer;
+    transition: opacity 0.6s ease, visibility 0.6s;
+  }
+  .splash img {
+    width: min(70vw, 360px);
+    height: auto;
+    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+    opacity: 0;
+    transform: rotate(-720deg) scale(0.2);
+    transition: opacity 0.6s ease-out, transform 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .splash.ready img { opacity: 1; transform: rotate(0deg) scale(1); }
+  .splash.hide { opacity: 0; visibility: hidden; }
+  .no-splash .splash { display: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .splash, .splash img { transition: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn { transition: none; }
+    .latest-honour { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="splash" id="splash" role="img" aria-label="Stapleford Monday Night Pool Team logo" title="Click to skip">
+  <img src="StaplefordCCMondayLogo.png" alt="">
+</div>
+
+<main class="table">
+  <div class="pocket p1"></div><div class="pocket p2"></div>
+  <div class="pocket p3"></div><div class="pocket p4"></div>
+  <div class="pocket p5"></div><div class="pocket p6"></div>
+  <div class="sight" style="left:25%"></div>
+  <div class="sight" style="left:75%"></div>
+
+  <div class="title-block">
+    <h1>Stapleford Monday Night Pool Team</h1>
+    <p class="latest-honour" id="latestHonour" hidden>
+      <span id="latestSeason"></span><span class="sep" aria-hidden="true"></span><span id="latestDivision"></span>
+    </p>
+  </div>
+
+  <nav aria-label="Main">
+    <a class="btn" href="team.html">
+      <div class="ball b1"><span>1</span></div>
+      The Team
+    </a>
+    <a class="btn" href="results.html">
+      <div class="ball b2"><span>2</span></div>
+      Match Results
+    </a>
+    <a class="btn" href="performance.html">
+      <div class="ball b3"><span>3</span></div>
+      Player Performance
+    </a>
+    <a class="btn" href="insights.html">
+      <div class="ball b8"><span>8</span></div>
+      Player Insights
+    </a>
+    <a class="btn" href="halloffame.html">
+      <div class="ball b5"><span>5</span></div>
+      Hall Of Fame
+    </a>
+    <a class="btn" href="game.html">
+      <div class="ball b6"><span>6</span></div>
+      Play Pot the Black
+    </a>
+  </nav>
+</main>
+
+<script>
+  (function () {
+    const splash = document.getElementById("splash");
+    if (document.documentElement.classList.contains("no-splash")) {
+      splash.remove();
+      return;
+    }
+
+    const img = splash.querySelector("img");
+    const SHOW_FOR = 2800; // how long the logo stays on screen (ms)
+    let closed = false;
+
+    function close() {
+      if (closed) return;
+      closed = true;
+      try { sessionStorage.setItem("splashSeen", "1"); } catch (e) {}
+      splash.classList.add("hide");
+      setTimeout(() => splash.remove(), 700);
+    }
+
+    function start() {
+      splash.classList.add("ready");
+      setTimeout(close, SHOW_FOR);
+    }
+
+    if (img.complete && img.naturalWidth) start();
+    else {
+      img.addEventListener("load", start);
+      img.addEventListener("error", close); // logo missing: go straight to the page
+    }
+
+    splash.addEventListener("click", close); // tap or click to skip
+    setTimeout(close, 6000); // safety net if the image is very slow
+  })();
+</script>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  // ── Firebase config ────────────────────────────────────────────
+  // Use the same values you put in team.html
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "stapleford-pool-monday-team.firebaseapp.com",
+    projectId: "stapleford-pool-monday-team",
+    storageBucket: "stapleford-pool-monday-team.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+  const HONOURS_COLLECTION = "hallOfFame";
+  // ───────────────────────────────────────────────────────────────
+
+  // Show the season and division of the latest Hall Of Fame entry under the title
+  try {
+    const db = getFirestore(initializeApp(firebaseConfig));
+    const snap = await getDocs(collection(db, HONOURS_COLLECTION));
+    const entries = snap.docs.map(d => d.data()).filter(e => e.season);
+
+    // Latest season first; if a season has several entries, the most recently added wins
+    entries.sort((a, b) =>
+      b.season.localeCompare(a.season, "en-GB", { numeric: true, sensitivity: "base" }) ||
+      ((b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))
+    );
+
+    const latest = entries[0];
+    if (latest) {
+      const label = document.getElementById("latestHonour");
+      document.getElementById("latestSeason").textContent = latest.season;
+      document.getElementById("latestDivision").textContent = latest.division || "";
+      label.querySelector(".sep").hidden = !latest.division;
+      label.hidden = false;
+      requestAnimationFrame(() => label.classList.add("show"));
+    }
+  } catch (err) {
+    // If the Hall Of Fame can't be read, the home page simply shows without the label
+    console.error(err);
+  }
+</script>
+
+</body>
+</html>
