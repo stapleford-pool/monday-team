@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pot the Black · Stapleford Monday Night Pool Team</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Barlow:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --baize: #0f5a3c;
+    --baize-dark: #08402a;
+    --rail: #5a2e1b;
+    --rail-light: #7a4127;
+    --brass: #d4a94f;
+    --chalk: #6fa8dc;
+    --ivory: #f5f0e1;
+    --red: #d22b2b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Barlow", "Helvetica Neue", Arial, sans-serif;
+    color: var(--ivory);
+    background:
+      radial-gradient(ellipse at 50% 20%, rgba(255,255,255,0.10), transparent 60%),
+      var(--baize-dark);
+    min-height: 100vh;
+    padding: 24px 16px 48px;
+  }
+
+  .wrap {
+    max-width: 960px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(280px, 520px) minmax(240px, 1fr);
+    gap: 32px;
+    align-items: start;
+  }
+
+  header { grid-column: 1 / -1; }
+
+  .game-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .back {
+    display: inline-block;
+    color: var(--brass);
+    font-weight: 600;
+    text-decoration: none;
+    margin-bottom: 12px;
+  }
+  .back:hover { text-decoration: underline; }
+  .back:focus-visible { outline: 3px solid var(--chalk); outline-offset: 3px; border-radius: 4px; }
+
+  h1 {
+    font-family: "Alfa Slab One", Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(2rem, 6vw, 3rem);
+    line-height: 1.05;
+    text-shadow: 0 3px 0 rgba(0,0,0,0.35);
+  }
+
+  .scorebar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .scorebox {
+    flex: 1;
+    background: rgba(0,0,0,0.25);
+    border-radius: 16px;
+    padding: 8px 14px;
+  }
+  .scorebox .value {
+    font-family: "Alfa Slab One", Georgia, serif;
+    font-size: 1.6rem;
+    line-height: 1.1;
+  }
+  .scorebox .label { font-size: 0.9rem; opacity: 0.8; }
+
+  /* Game */
+  .game { position: relative; }
+
+  canvas {
+    display: block;
+    touch-action: none;
+    border-radius: 22px;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.5);
+    cursor: crosshair;
+  }
+
+  .hint {
+    margin-top: 12px;
+    opacity: 0.85;
+    text-align: center;
+    font-size: 0.98rem;
+  }
+
+  .overlay {
+    position: absolute;
+    inset: 0;
+    display: none;
+    place-items: center;
+    background: rgba(4, 30, 20, 0.78);
+    border-radius: 22px;
+    padding: 24px;
+    text-align: center;
+  }
+  .overlay.show { display: grid; }
+  .overlay-inner { width: 100%; max-width: 300px; }
+  .overlay h2 {
+    font-family: "Alfa Slab One", Georgia, serif;
+    font-weight: 400;
+    font-size: 2rem;
+    margin-bottom: 6px;
+  }
+  .overlay p { opacity: 0.9; margin-bottom: 18px; line-height: 1.45; }
+
+  .overlay form { display: grid; gap: 10px; margin-bottom: 14px; }
+  .overlay label { font-weight: 600; color: var(--brass); font-size: 0.95rem; }
+  .overlay input {
+    font: inherit;
+    font-size: 1.05rem;
+    padding: 12px 18px;
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background: rgba(0,0,0,0.35);
+    color: var(--ivory);
+    text-align: center;
+  }
+  .overlay input:focus { outline: none; border-color: var(--chalk); }
+  .saved-msg { color: var(--brass); font-weight: 600; margin-bottom: 14px; min-height: 1.4em; }
+
+  .btn {
+    font: inherit;
+    font-weight: 700;
+    font-size: 1.05rem;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 999px;
+    background: var(--ivory);
+    color: #1d1d1d;
+    cursor: pointer;
+    box-shadow: 0 5px 0 #b9b19b, 0 8px 14px rgba(0,0,0,0.35);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #b9b19b, 0 12px 18px rgba(0,0,0,0.4); }
+  .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #b9b19b, 0 3px 6px rgba(0,0,0,0.35); }
+  .btn:focus-visible { outline: 3px solid var(--chalk); outline-offset: 4px; }
+  .btn:disabled { opacity: 0.6; cursor: default; transform: none; }
+  .btn.gold { background: var(--brass); box-shadow: 0 5px 0 #9c7a33, 0 8px 14px rgba(0,0,0,0.35); }
+
+  /* Leaderboard */
+  .board {
+    background: rgba(0,0,0,0.22);
+    border-radius: 24px;
+    padding: 22px;
+  }
+  .board h2 {
+    font-family: "Alfa Slab One", Georgia, serif;
+    font-weight: 400;
+    font-size: 1.5rem;
+    margin-bottom: 4px;
+  }
+  .board .sub { opacity: 0.8; margin-bottom: 16px; font-size: 0.95rem; }
+  .board ol { list-style: none; display: grid; gap: 8px; }
+  .board li {
+    display: grid;
+    grid-template-columns: 2rem 1fr auto;
+    gap: 10px;
+    align-items: center;
+    padding: 10px 14px;
+    border-radius: 999px;
+    background: rgba(0,0,0,0.2);
+  }
+  .board li.me { outline: 2px solid var(--brass); }
+  .rank { font-weight: 700; opacity: 0.75; }
+  .board li:nth-child(1) .rank { color: var(--brass); opacity: 1; }
+  .pname { font-weight: 600; overflow-wrap: anywhere; }
+  .pscore { font-family: "Alfa Slab One", Georgia, serif; font-size: 1.1rem; }
+  .board li.message { display: block; background: none; padding: 4px 0; opacity: 0.85; line-height: 1.5; }
+
+  /* How to play */
+  .side { display: grid; gap: 20px; }
+  .howto {
+    background: rgba(0,0,0,0.22);
+    border-radius: 24px;
+    padding: 22px;
+  }
+  .howto h2 {
+    font-family: "Alfa Slab One", Georgia, serif;
+    font-weight: 400;
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+  }
+  .howto p { line-height: 1.55; margin-bottom: 10px; opacity: 0.92; }
+  .howto p:last-child { margin-bottom: 0; }
+  .howto strong { color: var(--brass); }
+
+  @media (max-width: 760px) {
+    .wrap { grid-template-columns: 1fr; gap: 24px; }
+    .scorebar { width: 100%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <a class="back" href="games.html">‹ Back to games</a>
+    <h1>Pot the Black</h1>
+  </header>
+
+  <div class="game-col">
+    <div class="scorebar" id="scorebar">
+      <div class="scorebox"><div class="value" id="score">0</div><div class="label">Potted</div></div>
+      <div class="scorebox"><div class="value" id="best">0</div><div class="label">Your best</div></div>
+    </div>
+
+    <div class="game" id="game">
+      <canvas id="table" aria-label="Pool table. Drag back from anywhere to aim and set power, then let go to shoot."></canvas>
+
+      <div class="overlay" id="overlay" role="dialog" aria-labelledby="overTitle">
+        <div class="overlay-inner">
+          <h2 id="overTitle">Missed!</h2>
+          <p id="overText">You potted 0.</p>
+          <form id="saveForm" autocomplete="off">
+            <label for="playerName">Your name for the leaderboard</label>
+            <input id="playerName" type="text" maxlength="20" placeholder="Your name" required>
+            <button class="btn gold" type="submit" id="saveBtn">Save score</button>
+          </form>
+          <div class="saved-msg" id="savedMsg"></div>
+          <button class="btn" type="button" id="againBtn">Play again</button>
+        </div>
+      </div>
+    </div>
+
+    <p class="hint" id="hint">Drag back from anywhere on the table to aim, then let go to shoot.</p>
+  </div>
+
+  <div class="side">
+  <section class="howto" aria-labelledby="howtoTitle">
+    <h2 id="howtoTitle">How to play</h2>
+    <p><strong>Take a shot.</strong> Press anywhere on the table and drag back, like pulling a slingshot. The further you pull, the harder the shot. Let go to shoot.</p>
+    <p><strong>Aim.</strong> The dotted line shows where the white is going. Where it meets a ball, an outline shows where the white will make contact, and a gold line shows which way the black will travel.</p>
+    <p><strong>Score.</strong> Pot the black to score a point and get a new layout. If the black stays on the table, or the white goes in a pocket, your run is over.</p>
+    <p><strong>Getting harder.</strong> Every 3 blacks, an extra ball is added to get in your way, up to 4 extras.</p>
+    <p><strong>Leaderboard.</strong> When your run ends, enter your name to save your score. The longest runs make the top 10.</p>
+  </section>
+
+  <aside class="board">
+    <h2>Leaderboard</h2>
+    <p class="sub">Most blacks potted in a row.</p>
+    <ol id="leaderboard"><li class="message" style="background:none">Loading scores…</li></ol>
+  </aside>
+  </div>
+</div>
+
+<script type="module">
+  // ── Firebase config ────────────────────────────────────────────
+  // Use the same values you put in team.html
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "stapleford-pool-monday-team.firebaseapp.com",
+    projectId: "stapleford-pool-monday-team",
+    storageBucket: "stapleford-pool-monday-team.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+  const SCORES_COLLECTION = "potTheBlack";
+  const LEADERBOARD_SIZE = 10;
+  // ───────────────────────────────────────────────────────────────
+
+  // ═══════════════ Table geometry (logical units) ═══════════════
+  const W = 500, H = 900;          // playing surface
+  const RAIL = 34;                 // cushion/wood border drawn around it
+  const R = 13;                    // ball radius
+  const POCKETS = [
+    { x: 0, y: 0, r: 27 }, { x: W, y: 0, r: 27 },
+    { x: 0, y: H, r: 27 }, { x: W, y: H, r: 27 },
+    { x: 0, y: H / 2, r: 24 }, { x: W, y: H / 2, r: 24 }
+  ];
+  const FULL_POWER_PULL = 220;     // drag distance for a full-power shot
+  const MAX_SPEED = 26;            // units per frame at full power
+  const SUBSTEPS = 6;
+  const FRICTION = 0.986;
+  const ROLLING_DRAG = 0.03;
+  const CUSHION_BOUNCE = 0.78;
+  const BLOCKER_COLOURS = [
+    { c: "#f2c230", n: 1 }, { c: "#1f4fb5", n: 2 },
+    { c: "#d22b2b", n: 3 }, { c: "#5b2a86", n: 4 }
+  ];
+
+  const canvas = document.getElementById("table");
+  const ctx = canvas.getContext("2d");
+  const scoreEl = document.getElementById("score");
+  const bestEl = document.getElementById("best");
+  const hintEl = document.getElementById("hint");
+  const overlay = document.getElementById("overlay");
+  const overTitle = document.getElementById("overTitle");
+  const overText = document.getElementById("overText");
+  const saveForm = document.getElementById("saveForm");
+  const nameInput = document.getElementById("playerName");
+  const saveBtn = document.getElementById("saveBtn");
+  const savedMsg = document.getElementById("savedMsg");
+  const againBtn = document.getElementById("againBtn");
+
+  let scale = 1;
+  let balls = [];
+  let state = "aim";               // aim | rolling | between | over
+  let score = 0;
+  let aiming = null;               // { sx, sy, cx, cy }
+  let toast = null;                // { text, until }
+  let pottedThisShot = { eight: false, cue: false };
+
+  let best = 0;
+  try { best = parseInt(localStorage.getItem("potTheBlackBest"), 10) || 0; } catch (e) {}
+  bestEl.textContent = best;
+  try { nameInput.value = localStorage.getItem("potTheBlackName") || ""; } catch (e) {}
+
+  // ═══════════════ Sizing ═══════════════
+  function resize() {
+    const totalW = W + RAIL * 2, totalH = H + RAIL * 2;
+    const col = canvas.closest(".game-col");
+    const availW = Math.min(col.clientWidth || 400, 520);
+    const availH = window.innerHeight * 0.74;
+    const cssW = Math.min(availW, availH * totalW / totalH);
+    const cssH = cssW * totalH / totalW;
+    const dpr = window.devicePixelRatio || 1;
+    canvas.style.width = cssW + "px";
+    canvas.style.height = cssH + "px";
+    canvas.width = Math.round(cssW * dpr);
+    canvas.height = Math.round(cssH * dpr);
+    scale = canvas.width / totalW;
+    document.getElementById("scorebar").style.width = cssW + "px";
+  }
+  window.addEventListener("resize", resize);
+
+  // ═══════════════ Layout ═══════════════
+  const rand = (a, b) => a + Math.random() * (b - a);
+  const dist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+
+  function freeSpot(existing, opts = {}) {
+    const margin = opts.margin ?? 40;
+    for (let tries = 0; tries < 500; tries++) {
+      const p = { x: rand(margin, W - margin), y: rand(margin, H - margin) };
+      if (opts.awayFromPockets && POCKETS.some(pk => dist(p, pk) < opts.awayFromPockets)) continue;
+      if (existing.some(b => dist(p, b) < (opts.gap ?? R * 3))) continue;
+      return p;
+    }
+    return { x: W / 2, y: H / 2 };
+  }
+
+  function newRack() {
+    balls = [];
+    const eight = { ...freeSpot([], { margin: 60, awayFromPockets: 110 }), kind: "eight" };
+    balls.push(eight);
+    const cue = { ...freeSpot(balls, { margin: 40, gap: 160 }), kind: "cue" };
+    balls.push(cue);
+
+    // Extra balls get in the way as your run grows
+    const blockers = Math.min(Math.floor(score / 3), BLOCKER_COLOURS.length);
+    for (let i = 0; i < blockers; i++) {
+      balls.push({ ...freeSpot(balls, { margin: 40, gap: R * 4 }), kind: "blocker", colour: BLOCKER_COLOURS[i] });
+    }
+    balls.forEach(b => { b.vx = 0; b.vy = 0; b.potted = false; });
+    pottedThisShot = { eight: false, cue: false };
+    state = "aim";
+  }
+
+  const cueBall = () => balls.find(b => b.kind === "cue");
+
+  // ═══════════════ Physics ═══════════════
+  function step() {
+    const f = 1 / SUBSTEPS;
+    for (let s = 0; s < SUBSTEPS; s++) {
+      for (const b of balls) {
+        if (b.potted) continue;
+        b.x += b.vx * f;
+        b.y += b.vy * f;
+
+        // Pockets
+        if (POCKETS.some(p => dist(b, p) < p.r)) {
+          b.potted = true;
+          b.vx = b.vy = 0;
+          if (b.kind === "eight") pottedThisShot.eight = true;
+          if (b.kind === "cue") pottedThisShot.cue = true;
+          continue;
+        }
+
+        // Cushions
+        if (b.x < R) { b.x = R; b.vx = -b.vx * CUSHION_BOUNCE; }
+        if (b.x > W - R) { b.x = W - R; b.vx = -b.vx * CUSHION_BOUNCE; }
+        if (b.y < R) { b.y = R; b.vy = -b.vy * CUSHION_BOUNCE; }
+        if (b.y > H - R) { b.y = H - R; b.vy = -b.vy * CUSHION_BOUNCE; }
+      }
+
+      // Ball-to-ball collisions (equal mass)
+      for (let i = 0; i < balls.length; i++) {
+        const a = balls[i];
+        if (a.potted) continue;
+        for (let j = i + 1; j < balls.length; j++) {
+          const b = balls[j];
+          if (b.potted) continue;
+          const dx = b.x - a.x, dy = b.y - a.y;
+          const d = Math.hypot(dx, dy);
+          if (d === 0 || d >= R * 2) continue;
+          const nx = dx / d, ny = dy / d;
+          const overlap = R * 2 - d;
+          a.x -= nx * overlap / 2; a.y -= ny * overlap / 2;
+          b.x += nx * overlap / 2; b.y += ny * overlap / 2;
+          const rel = (a.vx - b.vx) * nx + (a.vy - b.vy) * ny;
+          if (rel <= 0) continue;
+          const impulse = rel * 0.97;
+          a.vx -= impulse * nx; a.vy -= impulse * ny;
+          b.vx += impulse * nx; b.vy += impulse * ny;
+        }
+      }
+    }
+
+    let moving = false;
+    for (const b of balls) {
+      if (b.potted) continue;
+      // Cloth friction plus a little rolling resistance so slow balls stop cleanly
+      b.vx *= FRICTION; b.vy *= FRICTION;
+      const sp = Math.hypot(b.vx, b.vy);
+      if (sp < 0.08) { b.vx = 0; b.vy = 0; continue; }
+      const slowed = Math.max(0, sp - ROLLING_DRAG) / sp;
+      b.vx *= slowed; b.vy *= slowed;
+      moving = true;
+    }
+    return moving;
+  }
+
+  function endOfShot() {
+    if (pottedThisShot.cue) return gameOver("Scratch!", "The cue ball went in.");
+    if (pottedThisShot.eight) {
+      score++;
+      scoreEl.textContent = score;
+      if (score > best) {
+        best = score;
+        bestEl.textContent = best;
+        try { localStorage.setItem("potTheBlackBest", String(best)); } catch (e) {}
+      }
+      const extra = score % 3 === 0 && score / 3 <= BLOCKER_COLOURS.length ? " Extra ball added" : "";
+      toast = { text: "Potted!" + extra, until: performance.now() + 900 };
+      state = "between";
+      setTimeout(newRack, 750);
+      return;
+    }
+    gameOver("Missed!", "The black stayed on the table.");
+  }
+
+  // ═══════════════ Aiming ═══════════════
+  function toLogical(e) {
+    const rect = canvas.getBoundingClientRect();
+    const totalW = W + RAIL * 2, totalH = H + RAIL * 2;
+    return {
+      x: (e.clientX - rect.left) / rect.width * totalW - RAIL,
+      y: (e.clientY - rect.top) / rect.height * totalH - RAIL
+    };
+  }
+
+  canvas.addEventListener("pointerdown", (e) => {
+    if (state !== "aim") return;
+    canvas.setPointerCapture(e.pointerId);
+    const p = toLogical(e);
+    aiming = { sx: p.x, sy: p.y, cx: p.x, cy: p.y };
+  });
+  canvas.addEventListener("pointermove", (e) => {
+    if (!aiming) return;
+    const p = toLogical(e);
+    aiming.cx = p.x; aiming.cy = p.y;
+  });
+  function release() {
+    if (!aiming) return;
+    const dx = aiming.sx - aiming.cx, dy = aiming.sy - aiming.cy;
+    const len = Math.hypot(dx, dy);
+    aiming = null;
+    if (len < 8 || state !== "aim") return;
+    const power = Math.min(len / FULL_POWER_PULL, 1);
+    const speed = 1.5 + power * (MAX_SPEED - 1.5);
+    const cue = cueBall();
+    cue.vx = dx / len * speed;
+    cue.vy = dy / len * speed;
+    pottedThisShot = { eight: false, cue: false };
+    state = "rolling";
+    hintEl.textContent = "Pot the black without potting the white.";
+  }
+  canvas.addEventListener("pointerup", release);
+  canvas.addEventListener("pointercancel", () => { aiming = null; });
+
+  // Where the aim line meets the first ball or cushion
+  function traceAim(cue, dx, dy) {
+    let tBest = Infinity, hit = null;
+    for (const b of balls) {
+      if (b === cue || b.potted) continue;
+      const mx = cue.x - b.x, my = cue.y - b.y;
+      const bb = mx * dx + my * dy;
+      const c = mx * mx + my * my - (R * 2) ** 2;
+      const disc = bb * bb - c;
+      if (disc < 0) continue;
+      const t = -bb - Math.sqrt(disc);
+      if (t > 0 && t < tBest) { tBest = t; hit = b; }
+    }
+    const tx = dx > 0 ? (W - R - cue.x) / dx : dx < 0 ? (R - cue.x) / dx : Infinity;
+    const ty = dy > 0 ? (H - R - cue.y) / dy : dy < 0 ? (R - cue.y) / dy : Infinity;
+    const tWall = Math.min(tx, ty);
+    if (tWall < tBest) return { t: tWall, hit: null };
+    return { t: tBest, hit };
+  }
+
+  // ═══════════════ Drawing ═══════════════
+  function drawTable() {
+    const totalW = W + RAIL * 2, totalH = H + RAIL * 2;
+
+    // Wooden rail
+    ctx.fillStyle = "#5a2e1b";
+    roundRect(0, 0, totalW, totalH, 26); ctx.fill();
+    ctx.strokeStyle = "#7a4127"; ctx.lineWidth = 4;
+    roundRect(6, 6, totalW - 12, totalH - 12, 22); ctx.stroke();
+
+    // Felt
+    const g = ctx.createRadialGradient(totalW / 2, totalH * 0.4, 50, totalW / 2, totalH / 2, totalH * 0.7);
+    g.addColorStop(0, "#157049");
+    g.addColorStop(1, "#08402a");
+    ctx.fillStyle = g;
+    ctx.fillRect(RAIL, RAIL, W, H);
+
+    // Cushion edge
+    ctx.strokeStyle = "rgba(0,0,0,0.35)"; ctx.lineWidth = 3;
+    ctx.strokeRect(RAIL, RAIL, W, H);
+
+    // Brass sights
+    ctx.fillStyle = "#d4a94f";
+    const sight = (x, y) => { ctx.save(); ctx.translate(x, y); ctx.rotate(Math.PI / 4); ctx.fillRect(-3, -3, 6, 6); ctx.restore(); };
+    [0.25, 0.5, 0.75].forEach(f => { sight(RAIL + W * f, RAIL / 2); sight(RAIL + W * f, RAIL + H + RAIL / 2); });
+    [0.125, 0.25, 0.375, 0.625, 0.75, 0.875].forEach(f => { sight(RAIL / 2, RAIL + H * f); sight(RAIL + W + RAIL / 2, RAIL + H * f); });
+
+    // Pockets
+    for (const p of POCKETS) {
+      ctx.beginPath();
+      ctx.arc(RAIL + p.x, RAIL + p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = "#000"; ctx.fill();
+      ctx.strokeStyle = "#7a4127"; ctx.lineWidth = 3; ctx.stroke();
+    }
+  }
+
+  function roundRect(x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function drawBall(b) {
+    const x = RAIL + b.x, y = RAIL + b.y;
+    // shadow
+    ctx.beginPath();
+    ctx.arc(x + 2, y + 3, R, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(0,0,0,0.3)"; ctx.fill();
+
+    const base = b.kind === "cue" ? "#f7f4ea" : b.kind === "eight" ? "#141414" : b.colour.c;
+    const g = ctx.createRadialGradient(x - R * 0.35, y - R * 0.4, R * 0.1, x, y, R);
+    g.addColorStop(0, b.kind === "eight" ? "#555" : "#ffffff");
+    g.addColorStop(0.35, base);
+    g.addColorStop(1, shade(base));
+    ctx.beginPath();
+    ctx.arc(x, y, R, 0, Math.PI * 2);
+    ctx.fillStyle = g; ctx.fill();
+
+    if (b.kind !== "cue") {
+      ctx.beginPath();
+      ctx.arc(x, y, R * 0.5, 0, Math.PI * 2);
+      ctx.fillStyle = "#fff"; ctx.fill();
+      ctx.fillStyle = "#111";
+      ctx.font = `700 ${R * 0.75}px Barlow, Arial, sans-serif`;
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillText(b.kind === "eight" ? "8" : String(b.colour.n), x, y + 0.5);
+    }
+  }
+
+  function shade(hex) {
+    const n = parseInt(hex.slice(1), 16);
+    const r = Math.max(0, (n >> 16) * 0.55), g = Math.max(0, ((n >> 8) & 255) * 0.55), bl = Math.max(0, (n & 255) * 0.55);
+    return `rgb(${r|0},${g|0},${bl|0})`;
+  }
+
+  function drawAim() {
+    if (!aiming || state !== "aim") return;
+    const cue = cueBall();
+    const dx0 = aiming.sx - aiming.cx, dy0 = aiming.sy - aiming.cy;
+    const len = Math.hypot(dx0, dy0);
+    if (len < 8) return;
+    const dx = dx0 / len, dy = dy0 / len;
+    const power = Math.min(len / FULL_POWER_PULL, 1);
+
+    const { t, hit } = traceAim(cue, dx, dy);
+    const ex = cue.x + dx * t, ey = cue.y + dy * t;
+
+    // Aim line
+    ctx.save();
+    ctx.setLineDash([8, 8]);
+    ctx.strokeStyle = "rgba(245,240,225,0.7)";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(RAIL + cue.x, RAIL + cue.y);
+    ctx.lineTo(RAIL + ex, RAIL + ey);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    if (hit) {
+      // Ghost ball where the cue ball will make contact
+      ctx.beginPath();
+      ctx.arc(RAIL + ex, RAIL + ey, R, 0, Math.PI * 2);
+      ctx.strokeStyle = "rgba(245,240,225,0.8)";
+      ctx.stroke();
+      // Direction the object ball will travel
+      const ox = hit.x - ex, oy = hit.y - ey, ol = Math.hypot(ox, oy) || 1;
+      ctx.strokeStyle = "rgba(212,169,79,0.9)";
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(RAIL + hit.x, RAIL + hit.y);
+      ctx.lineTo(RAIL + hit.x + ox / ol * 90, RAIL + hit.y + oy / ol * 90);
+      ctx.stroke();
+    }
+    ctx.restore();
+
+    // Cue stick, pulled back according to power
+    const gap = R + 8 + power * 70;
+    const sx = RAIL + cue.x - dx * gap, sy = RAIL + cue.y - dy * gap;
+    const tx = sx - dx * 320, ty = sy - dy * 320;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = "#c8a46a"; ctx.lineWidth = 9;
+    ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(tx, ty); ctx.stroke();
+    ctx.strokeStyle = "#3b1d10"; ctx.lineWidth = 11;
+    ctx.beginPath(); ctx.moveTo(sx - dx * 200, sy - dy * 200); ctx.lineTo(tx, ty); ctx.stroke();
+    ctx.strokeStyle = "#f5f0e1"; ctx.lineWidth = 9;
+    ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(sx - dx * 6, sy - dy * 6); ctx.stroke();
+
+    // Power meter
+    const mw = 160, mh = 10, mx = RAIL + W / 2 - mw / 2, my = RAIL + H - 30;
+    ctx.fillStyle = "rgba(0,0,0,0.4)";
+    roundRect(mx - 3, my - 3, mw + 6, mh + 6, 8); ctx.fill();
+    ctx.fillStyle = power > 0.85 ? "#d22b2b" : "#d4a94f";
+    roundRect(mx, my, Math.max(mh, mw * power), mh, 5); ctx.fill();
+  }
+
+  function drawToast(now) {
+    if (!toast || now > toast.until) return;
+    const totalW = W + RAIL * 2;
+    ctx.save();
+    ctx.globalAlpha = Math.min(1, (toast.until - now) / 300);
+    ctx.font = `400 36px "Alfa Slab One", Georgia, serif`;
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillStyle = "rgba(0,0,0,0.4)";
+    ctx.fillText(toast.text, totalW / 2 + 2, RAIL + 90 + 3);
+    ctx.fillStyle = "#d4a94f";
+    ctx.fillText(toast.text, totalW / 2, RAIL + 90);
+    ctx.restore();
+  }
+
+  // ═══════════════ Loop ═══════════════
+  let last = performance.now(), acc = 0;
+  function frame(now) {
+    acc += Math.min(now - last, 100);
+    last = now;
+    while (acc >= 1000 / 60) {
+      if (state === "rolling" && !step()) endOfShot();
+      acc -= 1000 / 60;
+    }
+
+    ctx.setTransform(scale, 0, 0, scale, 0, 0);
+    ctx.clearRect(0, 0, W + RAIL * 2, H + RAIL * 2);
+    drawTable();
+    balls.filter(b => !b.potted).forEach(drawBall);
+    drawAim();
+    drawToast(now);
+    requestAnimationFrame(frame);
+  }
+
+  // ═══════════════ Game over + saving ═══════════════
+  let lastSavedId = null;
+
+  function gameOver(title, reason) {
+    state = "over";
+    overTitle.textContent = title;
+    overText.textContent = `${reason} You potted ${score} ${score === 1 ? "black" : "blacks"} in a row.`;
+    savedMsg.textContent = "";
+    saveForm.style.display = score > 0 && db ? "grid" : "none";
+    saveBtn.disabled = false;
+    saveBtn.textContent = "Save score";
+    overlay.classList.add("show");
+    (score > 0 && db ? nameInput : againBtn).focus();
+  }
+
+  function startGame() {
+    score = 0;
+    scoreEl.textContent = 0;
+    overlay.classList.remove("show");
+    hintEl.textContent = "Drag back from anywhere on the table to aim, then let go to shoot.";
+    newRack();
+  }
+  againBtn.addEventListener("click", startGame);
+
+  // Firebase (the game still works if this fails)
+  let db = null, scoresRef = null, fs = null;
+  const boardEl = document.getElementById("leaderboard");
+
+  saveForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name = nameInput.value.trim().slice(0, 20);
+    if (!name || !db) return;
+    saveBtn.disabled = true;
+    saveBtn.textContent = "Saving…";
+    try {
+      const ref = await fs.addDoc(scoresRef, { name, score, createdAt: fs.serverTimestamp() });
+      lastSavedId = ref.id;
+      try { localStorage.setItem("potTheBlackName", name); } catch (e2) {}
+      saveForm.style.display = "none";
+      savedMsg.textContent = "Score saved to the leaderboard.";
+      againBtn.focus();
+    } catch (err) {
+      console.error(err);
+      saveBtn.disabled = false;
+      saveBtn.textContent = "Save score";
+      savedMsg.textContent = "Couldn't save. Check your Firestore rules.";
+    }
+  });
+
+  function renderBoard(entries) {
+    boardEl.innerHTML = "";
+    if (entries.length === 0) {
+      const li = document.createElement("li");
+      li.className = "message";
+      li.style.background = "none";
+      li.textContent = "No scores yet. Pot a black and be the first on the board.";
+      boardEl.appendChild(li);
+      return;
+    }
+    entries.forEach((s, i) => {
+      const li = document.createElement("li");
+      if (s.id === lastSavedId) li.className = "me";
+      const rank = document.createElement("span"); rank.className = "rank"; rank.textContent = i + 1;
+      const name = document.createElement("span"); name.className = "pname"; name.textContent = s.name;
+      const sc = document.createElement("span"); sc.className = "pscore"; sc.textContent = s.score;
+      li.append(rank, name, sc);
+      boardEl.appendChild(li);
+    });
+  }
+
+  async function connectLeaderboard() {
+    try {
+      const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+      fs = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+      db = fs.getFirestore(initializeApp(firebaseConfig));
+      scoresRef = fs.collection(db, SCORES_COLLECTION);
+    } catch (err) {
+      console.error(err);
+      db = null;
+      boardEl.innerHTML = '<li class="message" style="background:none">Leaderboard unavailable right now. You can still play.</li>';
+      return;
+    }
+
+    fs.onSnapshot(
+      fs.query(scoresRef, fs.orderBy("score", "desc"), fs.limit(LEADERBOARD_SIZE * 3)),
+      (snap) => {
+        const entries = snap.docs
+          .map(d => ({ id: d.id, ...d.data() }))
+          // Ties go to whoever got there first
+          .sort((a, b) => (b.score - a.score) || ((a.createdAt?.seconds ?? Infinity) - (b.createdAt?.seconds ?? Infinity)))
+          .slice(0, LEADERBOARD_SIZE);
+        renderBoard(entries);
+      },
+      (err) => {
+        console.error(err);
+        boardEl.innerHTML = '<li class="message" style="background:none">Couldn\'t load the leaderboard. Check the config values in game.html and your Firestore rules.</li>';
+      }
+    );
+  }
+
+  // ═══════════════ Go ═══════════════
+  resize();
+  newRack();
+  requestAnimationFrame(frame);
+  connectLeaderboard();
+</script>
+
+</body>
+</html>
