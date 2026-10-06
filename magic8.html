@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Not-So-Magic 8 Ball · Stapleford Monday Night Pool Team</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Barlow:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --baize: #0f5a3c;
+    --baize-dark: #08402a;
+    --rail: #5a2e1b;
+    --rail-light: #7a4127;
+    --brass: #d4a94f;
+    --chalk: #6fa8dc;
+    --ivory: #f5f0e1;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Barlow", "Helvetica Neue", Arial, sans-serif;
+    color: var(--ivory);
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(255,255,255,0.10), transparent 60%),
+      var(--baize);
+    display: flex;
+    justify-content: center;
+    padding: 40px 24px;
+    min-height: 100vh;
+  }
+
+  .table {
+    width: 100%;
+    max-width: 620px;
+    border: 22px solid var(--rail);
+    border-radius: 28px;
+    background:
+      repeating-linear-gradient(45deg, rgba(0,0,0,0.03) 0 2px, transparent 2px 4px),
+      linear-gradient(180deg, var(--baize) 0%, var(--baize-dark) 100%);
+    box-shadow:
+      inset 0 0 0 3px var(--rail-light),
+      inset 0 0 60px rgba(0,0,0,0.45),
+      0 20px 50px rgba(0,0,0,0.5);
+    padding: 40px 32px 48px;
+    position: relative;
+    align-self: flex-start;
+    text-align: center;
+  }
+
+  .pocket {
+    position: absolute;
+    width: 34px; height: 34px;
+    background: #000;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px var(--rail-light);
+  }
+  .p1 { top: -28px; left: -28px; }
+  .p2 { top: -28px; right: -28px; }
+  .p3 { bottom: -28px; left: -28px; }
+  .p4 { bottom: -28px; right: -28px; }
+
+  .back {
+    display: block;
+    text-align: left;
+    color: var(--brass);
+    font-weight: 600;
+    text-decoration: none;
+    margin-bottom: 20px;
+  }
+  .back:hover { text-decoration: underline; }
+  .back:focus-visible { outline: 3px solid var(--chalk); outline-offset: 3px; border-radius: 4px; }
+
+  h1 {
+    font-family: "Alfa Slab One", Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(1.9rem, 6vw, 2.8rem);
+    line-height: 1.05;
+    text-shadow: 0 3px 0 rgba(0,0,0,0.35);
+    margin-bottom: 10px;
+  }
+  .intro { opacity: 0.85; margin-bottom: 28px; line-height: 1.5; }
+
+  /* The ball */
+  .ball-wrap {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 28px;
+  }
+
+  .eight-ball {
+    --size: min(78vw, 320px);
+    width: var(--size);
+    height: var(--size);
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    display: grid;
+    place-items: center;
+    background:
+      radial-gradient(circle at 32% 26%, rgba(255,255,255,0.35), rgba(255,255,255,0) 22%),
+      radial-gradient(circle at 50% 50%, #2a2a2a 0%, #111 55%, #000 100%);
+    box-shadow:
+      inset -18px -24px 40px rgba(0,0,0,0.8),
+      0 24px 40px rgba(0,0,0,0.5);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .eight-ball:focus-visible { outline: 4px solid var(--chalk); outline-offset: 6px; }
+
+  .face, .window {
+    position: absolute;
+    width: 64%;
+    height: 64%;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+
+  /* The classic white "8" circle */
+  .face {
+    width: 44%;
+    height: 44%;
+    background: radial-gradient(circle at 40% 35%, #fff, #e8e4d8);
+    box-shadow: inset -4px -6px 10px rgba(0,0,0,0.2);
+    font-family: "Alfa Slab One", Georgia, serif;
+    font-size: calc(var(--size) * 0.22);
+    color: #111;
+  }
+
+  /* The answer window */
+  .window {
+    background: radial-gradient(circle at 50% 45%, #10204a 0%, #050b1f 80%);
+    box-shadow: inset 0 0 18px rgba(0,0,0,0.9);
+    opacity: 0;
+    transform: scale(0.9);
+    overflow: hidden;
+  }
+  .triangle {
+    position: absolute;
+    width: 86%;
+    height: 76%;
+    top: 8%;
+    background: linear-gradient(180deg, #2c4fd6, #1a2f8f);
+    clip-path: polygon(50% 100%, 0 0, 100% 0);
+    opacity: 0.9;
+  }
+  .answer {
+    position: relative;
+    width: 82%;
+    margin-top: -12%;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #e8eeff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+    font-size: calc(var(--size) * 0.054);
+  }
+  .answer.long { font-size: calc(var(--size) * 0.046); }
+
+  .eight-ball.showing .face { opacity: 0; transform: scale(0.8); }
+  .eight-ball.showing .window { opacity: 1; transform: scale(1); }
+
+  .eight-ball.shaking { animation: shake 0.8s ease-in-out; }
+  @keyframes shake {
+    0%, 100% { transform: translate(0, 0) rotate(0); }
+    15% { transform: translate(-14px, 4px) rotate(-8deg); }
+    30% { transform: translate(12px, -6px) rotate(7deg); }
+    45% { transform: translate(-10px, 6px) rotate(-6deg); }
+    60% { transform: translate(8px, -3px) rotate(4deg); }
+    75% { transform: translate(-4px, 2px) rotate(-2deg); }
+  }
+
+  /* Question box */
+  .ask {
+    display: flex;
+    gap: 10px;
+    max-width: 460px;
+    margin: 0 auto;
+  }
+  .ask label {
+    position: absolute;
+    width: 1px; height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+  .ask input {
+    flex: 1;
+    min-width: 0;
+    font: inherit;
+    font-size: 1.05rem;
+    padding: 13px 20px;
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background: rgba(0,0,0,0.25);
+    color: var(--ivory);
+  }
+  .ask input::placeholder { color: rgba(245,240,225,0.55); }
+  .ask input:focus { outline: none; border-color: var(--chalk); }
+
+  .btn {
+    font: inherit;
+    font-weight: 700;
+    font-size: 1.05rem;
+    padding: 13px 24px;
+    border: none;
+    border-radius: 999px;
+    background: var(--ivory);
+    color: #1d1d1d;
+    cursor: pointer;
+    white-space: nowrap;
+    box-shadow: 0 5px 0 #b9b19b, 0 8px 14px rgba(0,0,0,0.35);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 7px 0 #b9b19b, 0 12px 18px rgba(0,0,0,0.4); }
+  .btn:active { transform: translateY(4px); box-shadow: 0 1px 0 #b9b19b, 0 3px 6px rgba(0,0,0,0.35); }
+  .btn:focus-visible { outline: 3px solid var(--chalk); outline-offset: 4px; }
+
+  .tip { margin-top: 18px; font-size: 0.95rem; opacity: 0.7; }
+
+  @media (max-width: 560px) {
+    .table { border-width: 14px; padding: 32px 16px 40px; }
+    .ask { flex-direction: column; }
+    .pocket { width: 26px; height: 26px; }
+    .p1, .p3 { left: -21px; }
+    .p2, .p4 { right: -21px; }
+    .p1, .p2 { top: -21px; }
+    .p3, .p4 { bottom: -21px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .eight-ball.shaking { animation: none; }
+    .face, .window, .btn { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<main class="table">
+  <div class="pocket p1"></div><div class="pocket p2"></div>
+  <div class="pocket p3"></div><div class="pocket p4"></div>
+
+  <a class="back" href="games.html">‹ Back to games</a>
+  <h1>The Not-So-Magic 8 Ball</h1>
+  <p class="intro">Ask it anything. It'll answer. You won't like it.</p>
+
+  <div class="ball-wrap">
+    <button class="eight-ball" id="ball" type="button" aria-label="Shake the 8 ball">
+      <span class="face" aria-hidden="true">8</span>
+      <span class="window" aria-hidden="true">
+        <span class="triangle"></span>
+        <span class="answer" id="answer"></span>
+      </span>
+    </button>
+  </div>
+
+  <p class="sr-answer" id="srAnswer" aria-live="polite" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)"></p>
+
+  <form class="ask" id="askForm" autocomplete="off">
+    <label for="question">Your question</label>
+    <input id="question" type="text" maxlength="120" placeholder="Will we win on Monday?">
+    <button class="btn" type="submit">Ask</button>
+  </form>
+
+  <p class="tip">Type a question and press Ask, or just tap the ball.</p>
+</main>
+
+<script>
+  const ANSWERS = [
+    // The "yes" pile
+    "Yes. Don't let it go to your head.",
+    "Annoyingly, yes.",
+    "It is certain. Unlike your break.",
+    "Yes, and I'm as surprised as you are.",
+    "Signs point to yes. Signs have been wrong before.",
+    "Fine. Yes. Happy now?",
+    "Yes. Which is more than can be said for your safety play.",
+    "Without a doubt. Write it down, it won't happen often.",
+    "Certainly. Now go and practise your cueing.",
+    "Most likely, provided you don't go in-off on the black again.",
+    "Yes. The spirits say so. The spirits have been drinking.",
+
+    // The "no" pile
+    "No. Next question.",
+    "Absolutely not. And put the chalk down.",
+    "My sources say no. My sources also saw your last match.",
+    "Not a chance. Much like your long pots.",
+    "No. Have you tried simply being better?",
+    "Outlook not so good. Outlook on your cueing is worse.",
+    "Very doubtful. Similar odds to you clearing the table.",
+    "No, and I think you already knew that.",
+    "Don't count on it. Or anything, really.",
+    "My answer is no, but in a nice way. Actually, not in a nice way.",
+
+    // The "can't be bothered" pile
+    "Ask again when you've had a lesson.",
+    "Reply hazy. Much like your plan for the next shot.",
+    "Cannot predict now. I'm busy being a ball.",
+    "Concentrate and ask again. Concentrating might help your game too.",
+    "Better not tell you now. You'd only cry.",
+    "Maybe. Stop rushing me.",
+    "I'd tell you, but you'd ignore it like every tip about your stance.",
+    "Possibly. About as likely as you remembering whose break it is.",
+    "Ask the team. They've got opinions about you anyway.",
+    "That's a question for someone who cares.",
+    "Unclear. I'm a plastic ball, not a miracle worker.",
+    "Try again. I wasn't listening.",
+
+    // The "how dare you" pile
+    "Why are you asking a ball? Says a lot, honestly.",
+    "I've seen better questions written on a beer mat.",
+    "Ask me after you've potted something in under three attempts.",
+    "Honestly? Even I'm embarrassed you asked that.",
+    "Yes. No. Whatever gets you off the table quicker.",
+    "I spend my life getting hit by people like you. Work it out yourself.",
+    "The answer's in the pocket. Unlike your last shot.",
+    "I'd answer, but you'd still find a way to miss it.",
+    "You've got more chance of a 147 on a pool table.",
+    "Bold of you to think the future has plans for you.",
+    "Let me check... no, still not interested.",
+    "Have you considered darts?"
+  ];
+
+  const NO_QUESTION = [
+    "You didn't ask anything. Bold strategy.",
+    "I can't answer a question you haven't asked. Even I have limits.",
+    "Silence. Much like the room after your last shot.",
+    "Go on then, type something. I'll wait. I'm a ball, I've got time.",
+    "Tapping me without a question? Rude."
+  ];
+
+  const ball = document.getElementById("ball");
+  const answerEl = document.getElementById("answer");
+  const srAnswer = document.getElementById("srAnswer");
+  const form = document.getElementById("askForm");
+  const questionInput = document.getElementById("question");
+
+  let lastAnswer = "";
+  let busy = false;
+
+  function pick(list) {
+    // Never the same answer twice in a row
+    let choice;
+    do { choice = list[Math.floor(Math.random() * list.length)]; }
+    while (list.length > 1 && choice === lastAnswer);
+    lastAnswer = choice;
+    return choice;
+  }
+
+  function shake() {
+    if (busy) return;
+    busy = true;
+
+    const question = questionInput.value.trim();
+    const answer = question ? pick(ANSWERS) : pick(NO_QUESTION);
+
+    ball.classList.remove("showing");
+    ball.classList.remove("shaking");
+    void ball.offsetWidth;            // restart the animation
+    ball.classList.add("shaking");
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    setTimeout(() => {
+      answerEl.textContent = answer;
+      answerEl.classList.toggle("long", answer.length > 55);
+      ball.classList.remove("shaking");
+      ball.classList.add("showing");
+      srAnswer.textContent = answer;
+      busy = false;
+    }, reduceMotion ? 150 : 850);
+  }
+
+  ball.addEventListener("click", shake);
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    shake();
+  });
+
+  // Typing a new question hides the old answer
+  questionInput.addEventListener("input", () => ball.classList.remove("showing"));
+
+  // Shake the phone to ask (where the browser allows it)
+  let lastShake = 0;
+  function onMotion(e) {
+    const a = e.accelerationIncludingGravity;
+    if (!a) return;
+    const force = Math.abs(a.x || 0) + Math.abs(a.y || 0) + Math.abs(a.z || 0);
+    const now = Date.now();
+    if (force > 35 && now - lastShake > 1500) {
+      lastShake = now;
+      shake();
+    }
+  }
+  if (typeof DeviceMotionEvent !== "undefined") {
+    if (typeof DeviceMotionEvent.requestPermission === "function") {
+      // iPhone needs permission, asked for the first time the ball is tapped
+      ball.addEventListener("click", function askOnce() {
+        DeviceMotionEvent.requestPermission()
+          .then(state => { if (state === "granted") window.addEventListener("devicemotion", onMotion); })
+          .catch(() => {});
+        ball.removeEventListener("click", askOnce);
+      });
+    } else {
+      window.addEventListener("devicemotion", onMotion);
+    }
+  }
+</script>
+
+</body>
+</html>
